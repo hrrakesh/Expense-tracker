@@ -145,3 +145,79 @@
     opacity: 1;
   }
 }
+
+/* ================= 4-DIGIT PIN AUTH & BACKGROUND BLUR ================= */
+
+/* Instant locked state before JS hydrates */
+html.app-is-locked #app-content-wrapper {
+  filter: blur(18px);
+  -webkit-filter: blur(18px);
+  pointer-events: none;
+  user-select: none;
+}
+
+html.app-is-locked #pin-auth-modal {
+  display: flex !important;
+}
+
+/* Smooth unblur & scale transition */
+#app-content-wrapper {
+  transition: filter 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: filter, transform;
+}
+
+.app-locked {
+  filter: blur(18px) !important;
+  -webkit-filter: blur(18px) !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  transform: scale(0.995);
+}
+
+/* Modal fade out transition */
+#pin-auth-modal {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#pin-auth-modal.unlocking {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* Shake animation on invalid PIN */
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-9px); }
+  40%, 80% { transform: translateX(9px); }
+}
+
+.animate-pin-shake {
+  animation: pinShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* PIN digit inputs styling */
+.pin-digit-box {
+  caret-color: #6366f1;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pin-digit-box:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
+}
+
+.pin-digit-box.pin-error {
+  border-color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #f87171 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35) !important;
+}
+
+.pin-digit-box.pin-success {
+  border-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  color: #34d399 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35) !important;
+}
+

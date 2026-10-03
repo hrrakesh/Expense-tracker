@@ -22,10 +22,21 @@ def allowed_file(filename):
 with app.app_context():
     database.init_db()
 
+# Hardcoded 4-digit security PIN for application access (default: 1234)
+APP_PIN = os.environ.get('APP_PIN', '3201')
+
 @app.route('/')
 def index():
     today = date.today().isoformat()
-    return render_template('index.html', today=today)
+    return render_template('index.html', today=today, app_pin=APP_PIN)
+
+@app.route('/api/auth/verify-pin', methods=['POST'])
+def verify_pin():
+    data = request.get_json() or {}
+    pin = str(data.get('pin', '')).strip()
+    if pin == APP_PIN:
+        return jsonify({'success': True, 'message': 'PIN verified successfully'})
+    return jsonify({'success': False, 'error': 'Invalid PIN'}), 401
 
 # ----------------- ACCOUNTS API -----------------
 @app.route('/api/accounts', methods=['GET'])

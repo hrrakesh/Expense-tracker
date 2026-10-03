@@ -14,6 +14,12 @@ let currentDayFilter = 'all';
 let currentTxType = 'debit';
 let currentCurrency = '₹';
 
+// Master Hardcoded 4-digit PIN (default '1234', can be configured via window.FINTRACK_PIN)
+const HARDCODED_PIN = String(window.FINTRACK_PIN || '1234');
+let pinDigits = ['', '', '', ''];
+let pinIsMasked = true;
+let isPinValidating = false;
+
 // Month names
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -24,6 +30,7 @@ const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', '
 
 // ------------------- INITIALIZATION -------------------
 document.addEventListener('DOMContentLoaded', async () => {
+  initPinAuthentication();
   updateCurrencySymbols();
 
   // Setup preset logo radio highlights
@@ -82,6 +89,339 @@ function formatDateISO(d) {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+// ================= 4-DIGIT PIN AUTHENTICATION =================
+function isAppUnlocked() {
+  return localStorage.getItem('fintrack_auth_unlocked') === 'true' ||
+         sessionStorage.getItem('fintrack_auth_unlocked') === 'true';
+}
+
+function initPinAuthentication() {
+  const modal = document.getElementById('pin-auth-modal');
+  const wrapper = document.getElementById('app-content-wrapper');
+  const digitBoxes = document.querySelectorAll('.pin-digit-box');
+  if (!modal || !wrapper || !digitBoxes.length) return;
+
+  if (isAppUnlocked()) {
+    modal.classList.add('hidden');
+    wrapper.classList.remove('app-locked');
+    document.documentElement.classList.remove('app-is-locked');
+  } else {
+    modal.classList.remove('hidden');
+    wrapper.classList.add('app-locked');
+    document.documentElement.classList.add('app-is-locked');
+    setTimeout(() => {
+      digitBoxes[0].focus();
+    }, 150);
+  }
+
+  // Setup input box events
+  digitBoxes.forEach((box, idx) => {
+    // When clicked/focused, select content
+    box.addEventListener('click', () => {
+      box.select();
+    });
+
+    // Handle input (typing single digit)
+    box.addEventListener('input', (e) => {
+      const val = e.target.value.replace(/\D/g, '');
+      if (val) {
+        const singleDigit = val.slice(-1);
+        box.value = singleDigit;
+        pinDigits[idx] = singleDigit;
+        clearPinFeedback();
+
+        // Advance to next box if available
+        if (idx < 3) {
+          digitBoxes[idx + 1].focus();
+          digitBoxes[idx + 1].select();
+        } else {
+          // 4th digit entered - validate immediately
+          validatePinCode();
+        }
+      } else {
+        pinDigits[idx] = '';
+      }
+    });
+
+    // Handle keydown for backspace and navigation
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        if (!box.value && idx > 0) {
+          e.preventDefault();
+          digitBoxes[idx - 1].value = '';
+          pinDigits[idx - 1] = '';
+          digitBoxes[idx - 1].focus();
+        } else {
+          pinDigits[idx] = '';
+        }
+        clearPinFeedback();
+      } else if (e.key === 'ArrowLeft' && idx > 0) {
+        e.preventDefault();
+        digitBoxes[idx - 1].focus();
+        digitBoxes[idx - 1].select();
+      } else if (e.key === 'ArrowRight' && idx < 3) {
+        e.preventDefault();
+        digitBoxes[idx + 1].focus();
+        digitBoxes[idx + 1].select();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (pinDigits.join('').length === 4) {
+          validatePinCode();
+        }
+      }
+    });
+
+    // Handle paste event
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasteText = (e.clipboardData || window.clipboardData).getData('text');
+      const numericDigits = pasteText.replace(/\D/g, '').slice(0, 4);
+      if (!numericDigits) return;
+
+      for (let i = 0; i < 4; i++) {
+        if (i < numericDigits.length) {
+          digitBoxes[i].value = numericDigits[i];
+          pinDigits[i] = numericDigits[i];
+        } else {
+          digitBoxes[i].value = '';
+          pinDigits[i] = '';
+        }
+      }
+
+      if (numericDigits.length === 4) {
+        digitBoxes[3].focus();
+        validatePinCode();
+      } else {
+        digitBoxes[numericDigits.length].focus();
+      }
+    });
+  });
+}
+
+function handleKeypadPress(val) {
+  if (isPinValidating) return;
+  const digitBoxes = document.querySelectorAll('.pin-digit-box');
+  if (!digitBoxes.length) return;
+
+  if (val === 'clear') {
+    pinDigits = ['', '', '', ''];
+    digitBoxes.forEach(b => b.value = '');
+    clearPinFeedback();
+    digitBoxes[0].focus();
+    return;
+  }
+
+  if (val === 'backspace') {
+    // Find last filled index
+    let lastFilledIdx = -1;
+    for (let i = 3; i >= 0; i--) {
+      if (pinDigits[i] !== '') {
+        lastFilledIdx = i;
+        break;
+      }
+    }
+    if (lastFilledIdx >= 0) {
+      pinDigits[lastFilledIdx] = '';
+      digitBoxes[lastFilledIdx].value = '';
+      digitBoxes[lastFilledIdx].focus();
+    } else {
+      digitBoxes[0].focus();
+    }
+    clearPinFeedback();
+    return;
+  }
+
+  // Number 0-9
+  let targetIdx = -1;
+  for (let i = 0; i < 4; i++) {
+    if (pinDigits[i] === '') {
+      targetIdx = i;
+      break;
+    }
+  }
+
+  if (targetIdx === -1) {
+    // If all are already filled, reset from start
+    targetIdx = 0;
+    pinDigits = ['', '', '', ''];
+    digitBoxes.forEach(b => b.value = '');
+  }
+
+  pinDigits[targetIdx] = String(val);
+  digitBoxes[targetIdx].value = String(val);
+  clearPinFeedback();
+
+  if (targetIdx < 3) {
+    digitBoxes[targetIdx + 1].focus();
+  } else {
+    // 4th digit filled - validate immediately
+    validatePinCode();
+  }
+}
+
+async function validatePinCode() {
+  const enteredPin = pinDigits.join('');
+  if (enteredPin.length !== 4) return;
+
+  isPinValidating = true;
+  const digitBoxes = document.querySelectorAll('.pin-digit-box');
+  const inputWrapper = document.getElementById('pin-inputs-wrapper');
+  const feedbackEl = document.getElementById('pin-feedback');
+  const iconContainer = document.getElementById('pin-lock-icon-container');
+  const icon = document.getElementById('pin-lock-icon');
+
+  if (enteredPin === HARDCODED_PIN) {
+    // Valid PIN!
+    digitBoxes.forEach(box => {
+      box.classList.remove('pin-error');
+      box.classList.add('pin-success');
+    });
+
+    if (iconContainer) {
+      iconContainer.className = 'w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/20 transition-all duration-300';
+    }
+    if (icon) {
+      icon.setAttribute('data-lucide', 'check-circle');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    if (feedbackEl) {
+      feedbackEl.textContent = 'PIN Verified! Unlocking...';
+      feedbackEl.className = 'h-5 flex items-center justify-center text-xs font-semibold text-emerald-400 opacity-100 transition-opacity';
+    }
+
+    // Persist session across tab & until clearing cache
+    localStorage.setItem('fintrack_auth_unlocked', 'true');
+    sessionStorage.setItem('fintrack_auth_unlocked', 'true');
+
+    // Notify server endpoint optionally
+    try {
+      fetch('/api/auth/verify-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: enteredPin })
+      }).catch(() => {});
+    } catch (e) {}
+
+    // Animate unlock and transition smoothly to index page with ambient blur background
+    setTimeout(() => {
+      const modal = document.getElementById('pin-auth-modal');
+      const wrapper = document.getElementById('app-content-wrapper');
+
+      if (modal) modal.classList.add('unlocking');
+      if (wrapper) wrapper.classList.remove('app-locked');
+      document.documentElement.classList.remove('app-is-locked');
+
+      setTimeout(() => {
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('unlocking');
+        }
+        isPinValidating = false;
+        showToast('FinTrack Pro unlocked', 'success');
+      }, 350);
+    }, 300);
+
+  } else {
+    // Invalid PIN!
+    if (inputWrapper) {
+      inputWrapper.classList.remove('animate-pin-shake');
+      void inputWrapper.offsetWidth; // Trigger reflow
+      inputWrapper.classList.add('animate-pin-shake');
+    }
+
+    digitBoxes.forEach(box => {
+      box.classList.add('pin-error');
+    });
+
+    if (feedbackEl) {
+      feedbackEl.textContent = 'Incorrect PIN. Please try again.';
+      feedbackEl.className = 'h-5 flex items-center justify-center text-xs font-semibold text-rose-400 opacity-100 transition-opacity';
+    }
+
+    setTimeout(() => {
+      pinDigits = ['', '', '', ''];
+      digitBoxes.forEach(b => {
+        b.value = '';
+        b.classList.remove('pin-error');
+      });
+      if (inputWrapper) inputWrapper.classList.remove('animate-pin-shake');
+      if (digitBoxes.length) digitBoxes[0].focus();
+      isPinValidating = false;
+    }, 600);
+  }
+}
+
+function clearPinFeedback() {
+  const feedbackEl = document.getElementById('pin-feedback');
+  if (feedbackEl) {
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'h-5 flex items-center justify-center text-xs font-semibold text-rose-400 opacity-0 transition-opacity';
+  }
+  const digitBoxes = document.querySelectorAll('.pin-digit-box');
+  digitBoxes.forEach(b => b.classList.remove('pin-error', 'pin-success'));
+}
+
+function togglePinVisibility() {
+  pinIsMasked = !pinIsMasked;
+  const digitBoxes = document.querySelectorAll('.pin-digit-box');
+  const visibilityText = document.getElementById('pin-visibility-text');
+  const eyeIcon = document.getElementById('pin-eye-icon');
+
+  digitBoxes.forEach(box => {
+    box.type = pinIsMasked ? 'password' : 'text';
+  });
+
+  if (visibilityText) {
+    visibilityText.textContent = pinIsMasked ? 'Show PIN' : 'Hide PIN';
+  }
+
+  if (eyeIcon) {
+    eyeIcon.setAttribute('data-lucide', pinIsMasked ? 'eye' : 'eye-off');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function lockApp() {
+  // Clear persistent session storage
+  localStorage.removeItem('fintrack_auth_unlocked');
+  sessionStorage.removeItem('fintrack_auth_unlocked');
+
+  const modal = document.getElementById('pin-auth-modal');
+  const wrapper = document.getElementById('app-content-wrapper');
+  const digitBoxes = document.querySelectorAll('.pin-digit-box');
+  const iconContainer = document.getElementById('pin-lock-icon-container');
+  const icon = document.getElementById('pin-lock-icon');
+
+  if (iconContainer) {
+    iconContainer.className = 'w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/20 transition-all duration-300';
+  }
+  if (icon) {
+    icon.setAttribute('data-lucide', 'lock');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  pinDigits = ['', '', '', ''];
+  digitBoxes.forEach(b => {
+    b.value = '';
+    b.classList.remove('pin-error', 'pin-success');
+  });
+  clearPinFeedback();
+
+  if (wrapper) wrapper.classList.add('app-locked');
+  document.documentElement.classList.add('app-is-locked');
+
+  if (modal) {
+    modal.classList.remove('hidden', 'unlocking');
+  }
+
+  setTimeout(() => {
+    if (digitBoxes.length) digitBoxes[0].focus();
+  }, 100);
+
+  showToast('FinTrack locked', 'info');
 }
 
 // ------------------- TOAST NOTIFICATIONS -------------------

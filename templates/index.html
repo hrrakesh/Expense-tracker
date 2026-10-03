@@ -49,8 +49,26 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Custom Styles -->
   <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- Immediate Session Lock Check to prevent flash of content -->
+  <script>
+    window.FINTRACK_PIN = "{{ app_pin }}";
+    if (localStorage.getItem('fintrack_auth_unlocked') !== 'true' && sessionStorage.getItem('fintrack_auth_unlocked') !== 'true') {
+      document.documentElement.classList.add('app-is-locked');
+    }
+  </script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white relative overflow-x-hidden">
+
+  <!-- Ambient Blurred Background Orbs (Modern Blur BG) -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/15 rounded-full blur-[100px]"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px]"></div>
+    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-emerald-600/10 rounded-full blur-[100px]"></div>
+  </div>
+
+  <!-- ================= APP CONTENT WRAPPER (BLURRED WHEN LOCKED) ================= -->
+  <div id="app-content-wrapper" class="flex-1 flex flex-col transition-all duration-500">
 
   <!-- ================= TOP NAVIGATION BAR ================= -->
   <header class="sticky top-0 z-40 backdrop-blur-xl bg-slate-900/80 border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
@@ -100,6 +118,12 @@
         <button onclick="openCategoryModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 hover:border-slate-600 transition shadow-sm">
           <i data-lucide="tag" class="w-4 h-4 text-indigo-400"></i>
           <span class="hidden sm:inline">Categories</span>
+        </button>
+
+        <!-- Lock App Button -->
+        <button id="lock-app-btn" onclick="lockApp()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-amber-400 border border-slate-700 hover:border-amber-500/40 transition shadow-sm" title="Lock FinTrack (Require PIN)">
+          <i data-lucide="lock" class="w-4 h-4 text-amber-400"></i>
+          <span class="hidden sm:inline">Lock</span>
         </button>
 
         <!-- Add Bank/Wallet Button -->
@@ -315,6 +339,7 @@
     </div>
 
   </main>
+  </div> <!-- /#app-content-wrapper -->
 
   <!-- ================= MODALS SECTION ================= -->
 
@@ -639,6 +664,82 @@
       <button onclick="closeLockedModal()" class="w-full py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition">
         Understood
       </button>
+    </div>
+  </div>
+
+  <!-- ================= 4-DIGIT PIN AUTHENTICATION OVERLAY ================= -->
+  <div id="pin-auth-modal" class="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-2xl hidden transition-all duration-300">
+    <div class="relative w-full max-w-sm sm:max-w-md bg-slate-900/95 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/60 backdrop-blur-xl text-center space-y-5 animate-in">
+      
+      <!-- Top Decorative Glow -->
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-20 bg-indigo-500/20 blur-2xl rounded-full pointer-events-none"></div>
+
+      <!-- Icon & Branding -->
+      <div class="flex flex-col items-center gap-2.5">
+        <div id="pin-lock-icon-container" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/20 transition-all duration-300">
+          <i id="pin-lock-icon" data-lucide="lock" class="w-8 h-8 text-white transition-all duration-300"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">FinTrack<span class="text-indigo-400">Pro</span></h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Enter your 4-digit security PIN to unlock</p>
+        </div>
+      </div>
+
+      <!-- PIN Input Boxes (4 Digits) -->
+      <div class="space-y-2">
+        <div id="pin-inputs-wrapper" class="flex items-center justify-center gap-3 sm:gap-3.5 transition-transform duration-200">
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="0" autofocus />
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="1" />
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="2" />
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="3" />
+        </div>
+
+        <!-- Feedback & Error Message -->
+        <div id="pin-feedback" class="h-5 flex items-center justify-center text-xs font-semibold text-rose-400 opacity-0 transition-opacity">
+          <!-- Text inserted by JS -->
+        </div>
+
+        <!-- Toggle Visibility Button -->
+        <div class="flex items-center justify-center">
+          <button type="button" id="toggle-pin-visibility-btn" onclick="togglePinVisibility()" class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition px-2.5 py-1 rounded-lg hover:bg-slate-800">
+            <i id="pin-eye-icon" data-lucide="eye" class="w-3.5 h-3.5"></i>
+            <span id="pin-visibility-text">Show PIN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Keypad (Clickable on desktop & tap on mobile) -->
+      <div class="grid grid-cols-3 gap-2 max-w-[260px] mx-auto pt-1">
+        <button type="button" onclick="handleKeypadPress('1')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">1</button>
+        <button type="button" onclick="handleKeypadPress('2')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">2</button>
+        <button type="button" onclick="handleKeypadPress('3')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">3</button>
+        
+        <button type="button" onclick="handleKeypadPress('4')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">4</button>
+        <button type="button" onclick="handleKeypadPress('5')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">5</button>
+        <button type="button" onclick="handleKeypadPress('6')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">6</button>
+        
+        <button type="button" onclick="handleKeypadPress('7')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">7</button>
+        <button type="button" onclick="handleKeypadPress('8')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">8</button>
+        <button type="button" onclick="handleKeypadPress('9')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">9</button>
+        
+        <button type="button" onclick="handleKeypadPress('clear')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/50 shadow-sm transition active:scale-95">Clear</button>
+        <button type="button" onclick="handleKeypadPress('0')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">0</button>
+        <button type="button" onclick="handleKeypadPress('backspace')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 border border-slate-700/50 shadow-sm flex items-center justify-center transition active:scale-95" title="Backspace">
+          <i data-lucide="delete" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Security Notice & Default PIN info -->
+      <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+        <span class="flex items-center gap-1">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-400"></i>
+          Tab Session Protected
+        </span>
+        <!-- <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full font-mono font-medium">
+          PIN: 1234
+        </span> -->
+      </div>
+
     </div>
   </div>
 
