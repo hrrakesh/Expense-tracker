@@ -102,6 +102,21 @@ def get_db():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
+def check_db_connection():
+    """
+    Test database connection by executing a lightweight query.
+    Returns True if connection is successful, False otherwise.
+    """
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        row = cursor.fetchone()
+        conn.close()
+        return bool(row)
+    except Exception:
+        return False
+
 
 def init_db():
     conn = get_db()

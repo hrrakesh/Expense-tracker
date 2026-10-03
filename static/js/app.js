@@ -30,6 +30,16 @@ const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', '
 
 // ------------------- INITIALIZATION -------------------
 document.addEventListener('DOMContentLoaded', async () => {
+  // Check DB connection before loading page content
+  const dbIsConnected = await verifyDbConnection();
+  if (!dbIsConnected) {
+    document.body.innerHTML = '';
+    return;
+  }
+
+  // Display top DB connection notification
+  showTopDbBanner('Database connected successfully');
+
   initPinAuthentication();
   updateCurrencySymbols();
 
@@ -422,6 +432,48 @@ function lockApp() {
   }, 100);
 
   showToast('FinTrack locked', 'info');
+}
+
+// ------------------- DATABASE STATUS & TOP BANNER -------------------
+async function verifyDbConnection() {
+  if (window.DB_CONNECTED === false) {
+    return false;
+  }
+  try {
+    const res = await fetch('/api/db-status');
+    if (!res.ok) return false;
+    const data = await res.json();
+    return Boolean(data.success);
+  } catch (err) {
+    return false;
+  }
+}
+
+function showTopDbBanner(message = 'Database connected successfully') {
+  const banner = document.getElementById('db-connected-top-banner');
+  const textEl = document.getElementById('db-connected-top-text');
+  if (textEl && message) textEl.textContent = message;
+
+  if (banner) {
+    // Click to dismiss
+    banner.onclick = () => {
+      banner.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      banner.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+    };
+
+    // Slide down animation
+    setTimeout(() => {
+      banner.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+      banner.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      if (window.lucide) lucide.createIcons();
+    }, 200);
+
+    // Auto dismiss after 4.5 seconds
+    setTimeout(() => {
+      banner.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      banner.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+    }, 4500);
+  }
 }
 
 // ------------------- TOAST NOTIFICATIONS -------------------
