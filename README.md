@@ -84,10 +84,23 @@ Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser!
 ```text
 Expense-tracker-app/
 │
-├── app.py                      # Flask routes and API endpoints
-├── database.py                 # SQLite3 schema, initialization, and queries
-├── requirements.txt            # Python dependencies (Flask, Werkzeug)
+├── app.py                      # Application factory, configuration & blueprint registration
+├── config.py                   # Central app configuration, constants & environment variables
+├── database.py                 # SQLite3 / Turso schema, initialization, and queries
+├── requirements.txt            # Python dependencies (Flask, Werkzeug, libsql-client, etc.)
 ├── README.md                   # Documentation and usage guide
+├── tracker-app.bat             # Windows one-click desktop launcher
+│
+├── blueprints/                 # Modular Flask Blueprints
+│   ├── __init__.py             # Blueprint package registry
+│   ├── main.py                 # Web dashboard root route
+│   ├── auth.py                 # PIN verification authentication endpoint
+│   ├── accounts.py             # Bank & wallet accounts CRUD and logo upload handling
+│   ├── categories.py           # Income & expense categories CRUD
+│   ├── calendar.py             # Monthly calendar view & lock boundary logic
+│   ├── transactions.py         # Transaction record creation, editing, and deletion
+│   ├── stats.py                # Net worth, monthly savings, and top categories stats
+│   └── helpers.py              # File upload validation helpers
 │
 ├── static/
 │   ├── css/
