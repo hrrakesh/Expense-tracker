@@ -500,7 +500,7 @@ function renderAccountsShelf() {
 
   if (accountsList.length === 0) {
     shelf.innerHTML = `
-      <div class="col-span-full py-8 text-center bg-slate-850/40 rounded-2xl border border-dashed border-slate-800">
+      <div class="col-span-full w-full py-8 text-center bg-slate-850/40 rounded-2xl border border-dashed border-slate-800">
         <i data-lucide="landmark" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
         <p class="text-xs text-slate-400 font-medium">No accounts added yet.</p>
         <button onclick="openAddAccountModal()" class="mt-2.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition">
@@ -518,39 +518,39 @@ function renderAccountsShelf() {
     const isNegative = acc.current_balance < 0;
 
     html += `
-      <div onclick="filterByAccount(${acc.id})" class="account-card rounded-2xl p-4 flex flex-col justify-between ${isActive ? 'active-filter' : ''}">
+      <div onclick="filterByAccount(${acc.id})" class="account-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between min-w-[240px] xs:min-w-[260px] sm:min-w-0 snap-start shrink-0 sm:shrink ${isActive ? 'active-filter' : ''}">
         <!-- Top Row: Logo, Name & Type -->
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex items-center gap-2.5">
-            ${renderLogoHTML(acc.logo, acc.name, 'w-9 h-9')}
-            <div class="overflow-hidden">
-              <h4 class="font-bold text-sm text-slate-100 truncate" title="${acc.name}">${acc.name}</h4>
-              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">${acc.account_type}</span>
+        <div class="flex items-start justify-between gap-2.5">
+          <div class="flex items-center gap-2.5 min-w-0">
+            ${renderLogoHTML(acc.logo, acc.name, 'w-8 h-8 sm:w-9 sm:h-9 shrink-0')}
+            <div class="overflow-hidden min-w-0">
+              <h4 class="font-bold text-xs sm:text-sm text-slate-100 truncate" title="${acc.name}">${acc.name}</h4>
+              <span class="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-slate-400 block truncate">${acc.account_type}</span>
             </div>
           </div>
           
-          <div class="flex items-center gap-1">
-            <button onclick="event.stopPropagation(); openEditAccountModal(${acc.id})" title="Edit account details and logo" class="text-slate-400 hover:text-indigo-400 p-1 rounded-lg hover:bg-slate-800 transition">
+          <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <button onclick="event.stopPropagation(); openEditAccountModal(${acc.id})" title="Edit account details and logo" class="text-slate-400 hover:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-800 transition">
               <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="event.stopPropagation(); deleteAccount(${acc.id}, '${acc.name}')" title="Delete account" class="text-slate-400 hover:text-rose-400 p-1 rounded-lg hover:bg-slate-800 transition">
+            <button onclick="event.stopPropagation(); deleteAccount(${acc.id}, '${acc.name}')" title="Delete account" class="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-800 transition">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         </div>
 
         <!-- Middle: Dynamic Current Balance -->
-        <div class="mt-3">
-          <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Current Balance</span>
-          <div class="font-mono text-base font-extrabold ${isNegative ? 'text-rose-400' : 'text-emerald-400'}">
+        <div class="mt-2.5 sm:mt-3">
+          <span class="text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Current Balance</span>
+          <div class="font-mono text-sm sm:text-base font-extrabold truncate ${isNegative ? 'text-rose-400' : 'text-emerald-400'}">
             ${formatCurrency(acc.current_balance)}
           </div>
         </div>
 
         <!-- Bottom: Credits & Debits quick stats -->
         <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-          <span class="text-emerald-400">+${formatCurrency(acc.total_credits)}</span>
-          <span class="text-rose-400">-${formatCurrency(acc.total_debits)}</span>
+          <span class="text-emerald-400 truncate">+${formatCurrency(acc.total_credits)}</span>
+          <span class="text-rose-400 truncate">-${formatCurrency(acc.total_debits)}</span>
         </div>
       </div>
     `;
@@ -727,19 +727,20 @@ function renderCalendarGrid(year, month) {
     // Header inside cell: Date number + Lock icon (if future)
     let headerHTML = `
       <div class="flex items-center justify-between">
-        <span class="day-number-badge w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-slate-200">
+        <span class="day-number-badge w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-200">
           ${d}
         </span>
-        ${isFuture ? `<span title="Future date locked" class="text-amber-400/80"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>` : ''}
-        ${isToday ? `<span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>` : ''}
+        ${isFuture ? `<span title="Future date locked" class="text-amber-400/80"><i data-lucide="lock" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></span>` : ''}
+        ${isToday ? `<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-indigo-400 animate-ping"></span>` : ''}
       </div>
     `;
 
     // Activity indicator inside cell (Credits & Debits)
-    let indicatorsHTML = `<div class="mt-1 space-y-0.5">`;
+    // Desktop indicator: Detailed formatted currency values
+    let desktopIndicators = `<div class="hidden sm:block mt-1 space-y-0.5">`;
     if (!isFuture && summary.count > 0) {
       if (summary.credit > 0) {
-        indicatorsHTML += `
+        desktopIndicators += `
           <div class="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 truncate">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
             <span class="truncate">+${formatCurrency(summary.credit)}</span>
@@ -747,7 +748,7 @@ function renderCalendarGrid(year, month) {
         `;
       }
       if (summary.debit > 0) {
-        indicatorsHTML += `
+        desktopIndicators += `
           <div class="flex items-center gap-1 text-[10px] font-mono font-bold text-rose-400 truncate">
             <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
             <span class="truncate">-${formatCurrency(summary.debit)}</span>
@@ -755,15 +756,27 @@ function renderCalendarGrid(year, month) {
         `;
       }
     } else if (isFuture) {
-      indicatorsHTML += `
+      desktopIndicators += `
         <div class="text-[9px] font-medium text-slate-500 italic flex items-center gap-1">
           <span>Locked</span>
         </div>
       `;
     }
-    indicatorsHTML += `</div>`;
+    desktopIndicators += `</div>`;
 
-    cell.innerHTML = headerHTML + indicatorsHTML;
+    // Mobile indicator: Sleek compact indicator dots
+    let mobileIndicators = `<div class="flex sm:hidden items-center justify-center gap-1 mt-auto pt-0.5">`;
+    if (!isFuture && summary.count > 0) {
+      if (summary.credit > 0) {
+        mobileIndicators += `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50"></span>`;
+      }
+      if (summary.debit > 0) {
+        mobileIndicators += `<span class="w-1.5 h-1.5 rounded-full bg-rose-400 shadow-sm shadow-rose-400/50"></span>`;
+      }
+    }
+    mobileIndicators += `</div>`;
+
+    cell.innerHTML = headerHTML + desktopIndicators + mobileIndicators;
 
     // Click handler
     cell.addEventListener('click', () => {
@@ -802,6 +815,12 @@ function onDateCellClicked(dateStr, isFuture) {
   if (isFuture) {
     // Open locked date modal alert
     openLockedModal(dateStr);
+  } else if (window.innerWidth < 1024) {
+    // On mobile screens, smoothly scroll to selected date details panel
+    const detailsPanel = document.getElementById('date-details-panel');
+    if (detailsPanel) {
+      detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 }
 
@@ -983,44 +1002,44 @@ function renderDayTransactions() {
     const categoryName = tx.category_name || (isCredit ? 'Income' : 'Expense');
 
     html += `
-      <div class="p-3 rounded-2xl bg-slate-800/70 border border-slate-700/70 hover:border-slate-600 transition flex items-center justify-between gap-3 group">
+      <div class="p-2.5 sm:p-3 rounded-2xl bg-slate-800/70 border border-slate-700/70 hover:border-slate-600 transition flex items-center justify-between gap-2.5 sm:gap-3 group">
         <!-- Left: Category Icon & Details -->
-        <div class="flex items-center gap-3 overflow-hidden">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 shadow-sm" style="background-color: ${tx.category_color || '#4f46e5'}20; border: 1px solid ${tx.category_color || '#4f46e5'}40">
+        <div class="flex items-center gap-2.5 sm:gap-3 overflow-hidden min-w-0">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-base sm:text-lg shrink-0 shadow-sm" style="background-color: ${tx.category_color || '#4f46e5'}20; border: 1px solid ${tx.category_color || '#4f46e5'}40">
             ${categoryIcon}
           </div>
-          <div class="overflow-hidden">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-xs text-white truncate">${categoryName}</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-medium ${isCredit ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+          <div class="overflow-hidden min-w-0">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <span class="font-bold text-xs text-white truncate max-w-[110px] xs:max-w-[140px] sm:max-w-none">${categoryName}</span>
+              <span class="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-mono font-medium ${isCredit ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
                 ${tx.type.toUpperCase()}
               </span>
             </div>
             
-            <p class="text-[11px] text-slate-400 truncate mt-0.5">${tx.description || 'No description'}</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">${tx.description || 'No description'}</p>
             
-            <div class="flex items-center gap-2 mt-1">
+            <div class="flex items-center gap-1.5 sm:gap-2 mt-1">
               <!-- Account badge with logo -->
-              <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-300 bg-slate-900/60 px-2 py-0.5 rounded-md border border-slate-700/60">
-                ${renderLogoHTML(tx.account_logo, tx.account_name, 'w-3.5 h-3.5')}
-                <span class="truncate max-w-[90px]">${tx.account_name}</span>
+              <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold text-slate-300 bg-slate-900/60 px-1.5 sm:px-2 py-0.5 rounded-md border border-slate-700/60 truncate max-w-[110px] xs:max-w-[140px]">
+                ${renderLogoHTML(tx.account_logo, tx.account_name, 'w-3 h-3 sm:w-3.5 sm:h-3.5')}
+                <span class="truncate">${tx.account_name}</span>
               </span>
-              ${tx.time ? `<span class="text-[10px] font-mono text-slate-500">${tx.time}</span>` : ''}
+              ${tx.time ? `<span class="text-[9px] sm:text-[10px] font-mono text-slate-500 shrink-0">${tx.time}</span>` : ''}
             </div>
           </div>
         </div>
 
         <!-- Right: Amount & Action Buttons (Edit + Delete) -->
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <div class="text-right">
-            <span class="font-mono font-extrabold text-sm ${amountColor}">
+            <span class="font-mono font-extrabold text-xs sm:text-sm ${amountColor}">
               ${sign}${formatCurrency(tx.amount)}
             </span>
           </div>
-          <button onclick="openEditTransactionModal(${tx.id})" title="Edit transaction action" class="opacity-50 group-hover:opacity-100 text-slate-400 hover:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-750 transition">
+          <button onclick="openEditTransactionModal(${tx.id})" title="Edit transaction action" class="opacity-80 sm:opacity-50 sm:group-hover:opacity-100 text-slate-400 hover:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-750 transition">
             <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
           </button>
-          <button onclick="deleteTransaction(${tx.id})" title="Delete entry" class="opacity-50 group-hover:opacity-100 text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-750 transition">
+          <button onclick="deleteTransaction(${tx.id})" title="Delete entry" class="opacity-80 sm:opacity-50 sm:group-hover:opacity-100 text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-750 transition">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -1506,6 +1525,15 @@ async function fetchOverviewStats() {
     if (netWorthEl) netWorthEl.textContent = formatCurrency(data.net_worth);
     if (monthCreditEl) monthCreditEl.textContent = `+${formatCurrency(data.month_credits)}`;
     if (monthDebitEl) monthDebitEl.textContent = `-${formatCurrency(data.month_debits)}`;
+
+    // Mobile overview strip elements
+    const mobileNetWorthEl = document.getElementById('mobile-net-worth');
+    const mobileMonthCreditEl = document.getElementById('mobile-month-credit');
+    const mobileMonthDebitEl = document.getElementById('mobile-month-debit');
+
+    if (mobileNetWorthEl) mobileNetWorthEl.textContent = formatCurrency(data.net_worth);
+    if (mobileMonthCreditEl) mobileMonthCreditEl.textContent = `+${formatCurrency(data.month_credits)}`;
+    if (mobileMonthDebitEl) mobileMonthDebitEl.textContent = `-${formatCurrency(data.month_debits)}`;
   } catch (err) {
     console.error('Error fetching overview stats:', err);
   }

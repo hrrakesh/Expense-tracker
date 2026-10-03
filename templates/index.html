@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
   <title>Expense Tracker</title>
   
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -17,6 +20,9 @@
       darkMode: 'class',
       theme: {
         extend: {
+          screens: {
+            'xs': '420px',
+          },
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
@@ -62,33 +68,31 @@
 
   <!-- Ambient Blurred Background Orbs (Modern Blur BG) -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/15 rounded-full blur-[100px]"></div>
-    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px]"></div>
-    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-emerald-600/10 rounded-full blur-[100px]"></div>
+    <div class="absolute -top-32 -left-32 w-72 sm:w-96 h-72 sm:h-96 bg-indigo-600/15 rounded-full blur-[80px] sm:blur-[100px]"></div>
+    <div class="absolute top-1/2 -right-32 w-72 sm:w-96 h-72 sm:h-96 bg-purple-600/10 rounded-full blur-[80px] sm:blur-[100px]"></div>
+    <div class="absolute -bottom-32 left-1/3 w-72 sm:w-96 h-72 sm:h-96 bg-emerald-600/10 rounded-full blur-[80px] sm:blur-[100px]"></div>
   </div>
 
   <!-- ================= APP CONTENT WRAPPER (BLURRED WHEN LOCKED) ================= -->
   <div id="app-content-wrapper" class="flex-1 flex flex-col transition-all duration-500">
 
   <!-- ================= TOP NAVIGATION BAR ================= -->
-  <header class="sticky top-0 z-40 backdrop-blur-xl bg-slate-900/80 border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-slate-900/85 border-b border-slate-800/80 px-3 sm:px-4 lg:px-8 py-2.5 sm:py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
       
       <!-- Brand Logo & Name -->
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 ring-1 ring-white/20">
-          <i data-lucide="wallet-cards" class="w-5 h-5 text-white"></i>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 ring-1 ring-white/20 shrink-0">
+          <i data-lucide="wallet-cards" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">FinTrack<span class="text-indigo-400">Pro</span></span>
-            <!-- <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">SQLite Edition</span> -->
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">FinTrack<span class="text-indigo-400">Pro</span></span>
           </div>
-          <!-- <p class="text-xs text-slate-400 font-medium hidden sm:block">Smart Accounts & Locked Calendar Expense Tracker</p> -->
         </div>
       </div>
 
-      <!-- Quick Net Worth & Monthly Stats Ribbon -->
+      <!-- Quick Net Worth & Monthly Stats Ribbon (Desktop / Tablet) -->
       <div class="hidden md:flex items-center gap-6 px-4 py-1.5 rounded-2xl bg-slate-800/50 border border-slate-700/60 shadow-inner">
         <div>
           <span class="text-[11px] text-slate-400 font-medium block">Total Net Worth</span>
@@ -107,29 +111,29 @@
       </div>
 
       <!-- Header Actions -->
-      <div class="flex items-center gap-2.5">
-        <!-- Currency Badge (INR ₹) -->
-        <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200">
-          <span class="text-indigo-400 font-mono text-sm">₹</span>
+      <div class="flex items-center gap-1.5 sm:gap-2.5">
+        <!-- Currency Badge (INR ₹) - Compact on small devices -->
+        <div class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 sm:py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200">
+          <span class="text-indigo-400 font-mono text-xs sm:text-sm">₹</span>
           <span>INR</span>
         </div>
 
         <!-- Manage Categories Button -->
-        <button onclick="openCategoryModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 hover:border-slate-600 transition shadow-sm">
+        <button onclick="openCategoryModal()" class="flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 hover:border-slate-600 transition shadow-sm" title="Categories">
           <i data-lucide="tag" class="w-4 h-4 text-indigo-400"></i>
           <span class="hidden sm:inline">Categories</span>
         </button>
 
         <!-- Lock App Button -->
-        <button id="lock-app-btn" onclick="lockApp()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-amber-400 border border-slate-700 hover:border-amber-500/40 transition shadow-sm" title="Lock FinTrack (Require PIN)">
+        <button id="lock-app-btn" onclick="lockApp()" class="flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-amber-400 border border-slate-700 hover:border-amber-500/40 transition shadow-sm" title="Lock FinTrack (Require PIN)">
           <i data-lucide="lock" class="w-4 h-4 text-amber-400"></i>
           <span class="hidden sm:inline">Lock</span>
         </button>
 
         <!-- Add Bank/Wallet Button -->
-        <button onclick="openAddAccountModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition transform active:scale-95">
+        <button onclick="openAddAccountModal()" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition transform active:scale-95 shrink-0 whitespace-nowrap">
           <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Add Account</span>
+          <span class="hidden sm:inline">Add </span>Account
         </button>
       </div>
 
@@ -137,16 +141,32 @@
   </header>
 
   <!-- ================= MAIN CONTAINER ================= -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+
+    <!-- Mobile Quick Stats Ribbon (Visible on small & medium screens) -->
+    <div class="md:hidden grid grid-cols-3 gap-2 p-3 rounded-2xl bg-slate-850/80 border border-slate-800/90 shadow-lg backdrop-blur-sm">
+      <div class="text-left">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Net Worth</span>
+        <span id="mobile-net-worth" class="font-bold font-mono text-xs sm:text-sm text-slate-100 truncate block">₹0.00</span>
+      </div>
+      <div class="text-center border-x border-slate-800/80 px-1">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Inflow</span>
+        <span id="mobile-month-credit" class="font-bold font-mono text-xs sm:text-sm text-emerald-400 truncate block">+₹0.00</span>
+      </div>
+      <div class="text-right">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Outflow</span>
+        <span id="mobile-month-debit" class="font-bold font-mono text-xs sm:text-sm text-rose-400 truncate block">-₹0.00</span>
+      </div>
+    </div>
 
     <!-- ================= TOP SECTION: BANK / WALLET ACCOUNTS ================= -->
-    <section class="space-y-3">
+    <section class="space-y-2.5 sm:space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
             <i data-lucide="landmark" class="w-4 h-4"></i>
           </div>
-          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">Bank & Wallet Accounts</h2>
+          <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200">Bank & Wallet Accounts</h2>
           <span id="accounts-count-badge" class="px-2 py-0.5 text-xs font-mono rounded-full bg-slate-800 text-slate-400 border border-slate-700">0</span>
         </div>
         
@@ -157,77 +177,69 @@
         </div>
       </div>
 
-      <!-- Accounts Horizontal Carousel / Grid -->
-      <div id="accounts-shelf" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+      <!-- Accounts Horizontal Carousel on mobile / Grid on desktop -->
+      <div id="accounts-shelf" class="flex sm:grid overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 no-scrollbar snap-x snap-mandatory touch-pan-x">
         <!-- Rendered dynamically by app.js -->
-        <div class="animate-pulse bg-slate-800/40 rounded-2xl p-4 border border-slate-800 h-28 flex items-center justify-center text-slate-500 text-xs">
+        <div class="col-span-full w-full animate-pulse bg-slate-800/40 rounded-2xl p-4 border border-slate-800 h-28 flex items-center justify-center text-slate-500 text-xs">
           Loading accounts...
         </div>
       </div>
     </section>
 
     <!-- ================= MAIN GRID: CALENDAR & DATE DETAIL PANEL ================= -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
       
       <!-- ================= LEFT / MAIN: CALENDAR VIEW ================= -->
-      <section class="lg:col-span-8 bg-slate-850/60 backdrop-blur-sm rounded-3xl border border-slate-800/90 shadow-2xl p-5 md:p-6 space-y-5">
+      <section class="lg:col-span-8 bg-slate-850/60 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-slate-800/90 shadow-2xl p-3.5 sm:p-5 md:p-6 space-y-3.5 sm:space-y-5">
         
         <!-- Calendar Controls & Legend -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+        <div class="flex flex-row items-center justify-between gap-2 border-b border-slate-800/80 pb-3 sm:pb-4">
           <!-- Month/Year Navigation -->
-          <div class="flex items-center gap-3">
-            <h3 id="calendar-month-title" class="text-xl md:text-2xl font-black tracking-tight text-white font-sans">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <h3 id="calendar-month-title" class="text-lg sm:text-2xl font-black tracking-tight text-white font-sans">
               October 2026
             </h3>
             
             <div class="flex items-center bg-slate-800/80 border border-slate-700/80 rounded-xl p-0.5">
-              <button id="cal-prev-btn" onclick="prevMonth()" title="Previous Month" class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
+              <button id="cal-prev-btn" onclick="prevMonth()" title="Previous Month" class="p-1 sm:p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
                 <i data-lucide="chevron-left" class="w-4 h-4"></i>
               </button>
-              <button onclick="jumpToToday()" title="Jump to Today" class="px-2.5 py-1 text-xs font-bold hover:bg-slate-700 rounded-lg text-indigo-400 hover:text-indigo-300 transition">
+              <button onclick="jumpToToday()" title="Jump to Today" class="px-2 sm:px-2.5 py-1 text-xs font-bold hover:bg-slate-700 rounded-lg text-indigo-400 hover:text-indigo-300 transition">
                 Today
               </button>
-              <button id="cal-next-btn" onclick="nextMonth()" title="Next Month" class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
+              <button id="cal-next-btn" onclick="nextMonth()" title="Next Month" class="p-1 sm:p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
                 <i data-lucide="chevron-right" class="w-4 h-4"></i>
               </button>
             </div>
           </div>
 
-          <!-- Calendar Status & Info Legend -->
-          <div class="flex items-center flex-wrap gap-3 text-xs text-slate-400">
-            <!-- <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
-              <span>Credit (Income)</span>
-            </div> -->
-            <!-- <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50"></span>
-              <span>Debit (Expense)</span>
-            </div> -->
+          <!-- Calendar Status & Info Legend (Hidden on small mobile) -->
+          <div class="hidden sm:flex items-center flex-wrap gap-3 text-xs text-slate-400">
             <div class="flex items-center gap-1.5 bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-700/50">
-              <!-- <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i> -->
-              <!-- <span class="text-[11px] font-medium text-slate-300">Future = Locked</span> -->
+              <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span class="text-[11px] font-medium text-slate-300">Future = Locked</span>
             </div>
           </div>
         </div>
 
         <!-- Month Summary Banner -->
-        <div class="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-800/40 to-slate-800/80 border border-slate-700/60">
+        <div class="grid grid-cols-3 gap-1.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-800/40 to-slate-800/80 border border-slate-700/60">
           <div class="text-center sm:text-left">
-            <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Month Inflows</span>
-            <span id="cal-month-credit" class="text-sm sm:text-base font-bold font-mono text-emerald-400">+₹0.00</span>
+            <span class="text-[9px] sm:text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Month Inflows</span>
+            <span id="cal-month-credit" class="text-xs sm:text-sm md:text-base font-bold font-mono text-emerald-400 truncate block">+₹0.00</span>
           </div>
-          <div class="text-center">
-            <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Month Expenses</span>
-            <span id="cal-month-debit" class="text-sm sm:text-base font-bold font-mono text-rose-400">-₹0.00</span>
+          <div class="text-center border-x sm:border-x-0 border-slate-700/40 px-1">
+            <span class="text-[9px] sm:text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Month Expenses</span>
+            <span id="cal-month-debit" class="text-xs sm:text-sm md:text-base font-bold font-mono text-rose-400 truncate block">-₹0.00</span>
           </div>
           <div class="text-center sm:text-right">
-            <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Net Balance</span>
-            <span id="cal-month-net" class="text-sm sm:text-base font-bold font-mono text-slate-200">₹0.00</span>
+            <span class="text-[9px] sm:text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Net Balance</span>
+            <span id="cal-month-net" class="text-xs sm:text-sm md:text-base font-bold font-mono text-slate-200 truncate block">₹0.00</span>
           </div>
         </div>
 
         <!-- Weekday Headers -->
-        <div class="grid grid-cols-7 gap-1.5 text-center text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div class="grid grid-cols-7 gap-1 sm:gap-1.5 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
           <div>Mon</div>
           <div>Tue</div>
           <div>Wed</div>
@@ -238,95 +250,79 @@
         </div>
 
         <!-- Calendar Days Grid (Filled by JS) -->
-        <div id="calendar-days-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+        <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 sm:gap-2">
           <!-- Calendar Day Cells will be injected here -->
         </div>
-
-        <!-- Locked Notice Footer -->
-        <!-- <div class="flex items-center gap-2 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-amber-300/90">
-          <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-amber-400"></i>
-          <span>
-            <strong>Lock Rule Active:</strong> In accordance with strict expense accounting, only past dates and today are unlocked. Future dates are view-only and cannot have records added ahead of time.
-          </span>
-        </div> -->
 
       </section>
 
       <!-- ================= RIGHT: SELECTED DATE DETAIL & TRANSACTION LOG ================= -->
-      <section id="date-details-panel" class="lg:col-span-4 bg-slate-850/60 backdrop-blur-sm rounded-3xl border border-slate-800/90 shadow-2xl p-5 md:p-6 space-y-5">
+      <section id="date-details-panel" class="lg:col-span-4 bg-slate-850/60 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-slate-800/90 shadow-2xl p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5">
         
         <!-- Date Header & Lock Status -->
-        <div class="flex items-start justify-between gap-3 border-b border-slate-800/80 pb-4">
+        <div class="flex items-start justify-between gap-3 border-b border-slate-800/80 pb-3 sm:pb-4">
           <div>
-            <div class="flex items-center gap-2">
-              <!-- <span id="selected-day-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                Today
-              </span> -->
-              <!-- <span id="lock-state-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <i data-lucide="unlock" class="w-3 h-3"></i> Unlocked
-              </span> -->
-            </div>
-            <h3 id="selected-date-display" class="text-xl font-black text-white mt-1">
+            <h3 id="selected-date-display" class="text-lg sm:text-xl font-black text-white mt-0.5">
               October 3, 2026
             </h3>
             <p id="selected-date-sub" class="text-xs text-slate-400 font-medium">Saturday</p>
           </div>
 
           <!-- Add Transaction Button for this date -->
-          <button id="add-tx-btn-for-date" onclick="openAddTransactionModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+          <button id="add-tx-btn-for-date" onclick="openAddTransactionModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>Add Action</span>
           </button>
         </div>
 
         <!-- Day Credit vs Debit Balance Cards -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
           <!-- Total Credit for date -->
-          <div class="p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 relative overflow-hidden">
+          <div class="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-emerald-500/5 border border-emerald-500/20 relative overflow-hidden">
             <div class="flex items-center justify-between mb-1">
-              <span class="text-[11px] uppercase tracking-wider font-bold text-emerald-400">Total Credit</span>
+              <span class="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-emerald-400">Total Credit</span>
               <div class="p-1 rounded-md bg-emerald-500/10 text-emerald-400">
                 <i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>
               </div>
             </div>
-            <div id="day-total-credit" class="text-lg font-black font-mono text-emerald-400">+₹0.00</div>
-            <span class="text-[10px] text-emerald-400/70 font-medium">Money Inflow</span>
+            <div id="day-total-credit" class="text-base sm:text-lg font-black font-mono text-emerald-400 truncate">+₹0.00</div>
+            <span class="text-[9px] sm:text-[10px] text-emerald-400/70 font-medium block">Money Inflow</span>
           </div>
 
           <!-- Total Debit for date -->
-          <div class="p-3.5 rounded-2xl bg-rose-500/5 border border-rose-500/20 relative overflow-hidden">
+          <div class="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-rose-500/5 border border-rose-500/20 relative overflow-hidden">
             <div class="flex items-center justify-between mb-1">
-              <span class="text-[11px] uppercase tracking-wider font-bold text-rose-400">Total Debit</span>
+              <span class="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-rose-400">Total Debit</span>
               <div class="p-1 rounded-md bg-rose-500/10 text-rose-400">
                 <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
               </div>
             </div>
-            <div id="day-total-debit" class="text-lg font-black font-mono text-rose-400">-₹0.00</div>
-            <span class="text-[10px] text-rose-400/70 font-medium">Money Outflow</span>
+            <div id="day-total-debit" class="text-base sm:text-lg font-black font-mono text-rose-400 truncate">-₹0.00</div>
+            <span class="text-[9px] sm:text-[10px] text-rose-400/70 font-medium block">Money Outflow</span>
           </div>
         </div>
 
         <!-- Day Net Summary Bar -->
-        <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between text-xs">
+        <div class="p-2.5 sm:p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between text-xs">
           <span class="text-slate-400 font-semibold">Day Net Balance</span>
           <span id="day-net-balance" class="font-mono font-bold text-slate-100">₹0.00</span>
         </div>
 
         <!-- Transactions Filter Tabs for Selected Date -->
         <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs">
-          <button onclick="filterDayTransactions('all')" id="tab-day-all" class="flex-1 py-1.5 font-bold rounded-lg bg-indigo-600 text-white transition text-center">
+          <button onclick="filterDayTransactions('all')" id="tab-day-all" class="flex-1 py-1.5 sm:py-2 font-bold rounded-lg bg-indigo-600 text-white transition text-center">
             All (<span id="count-day-all">0</span>)
           </button>
-          <button onclick="filterDayTransactions('credit')" id="tab-day-credit" class="flex-1 py-1.5 font-semibold rounded-lg text-slate-300 hover:text-white transition text-center">
+          <button onclick="filterDayTransactions('credit')" id="tab-day-credit" class="flex-1 py-1.5 sm:py-2 font-semibold rounded-lg text-slate-300 hover:text-white transition text-center">
             Credit (<span id="count-day-credit">0</span>)
           </button>
-          <button onclick="filterDayTransactions('debit')" id="tab-day-debit" class="flex-1 py-1.5 font-semibold rounded-lg text-slate-300 hover:text-white transition text-center">
+          <button onclick="filterDayTransactions('debit')" id="tab-day-debit" class="flex-1 py-1.5 sm:py-2 font-semibold rounded-lg text-slate-300 hover:text-white transition text-center">
             Debit (<span id="count-day-debit">0</span>)
           </button>
         </div>
 
         <!-- Transaction List Container -->
-        <div class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1" id="day-transactions-list">
+        <div class="space-y-2 max-h-[380px] sm:max-h-[460px] overflow-y-auto pr-1" id="day-transactions-list">
           <!-- Transactions injected by JS -->
           <div class="text-center py-10 text-slate-500 text-xs">
             <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
@@ -341,40 +337,48 @@
   </main>
   </div> <!-- /#app-content-wrapper -->
 
+  <!-- Floating Action Button for Mobile: Quick Add Transaction -->
+  <div class="fixed bottom-5 right-5 z-30 lg:hidden">
+    <button onclick="openAddTransactionModal()" class="flex items-center gap-2 px-4 py-3 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-2xl shadow-indigo-600/50 ring-2 ring-white/20 active:scale-95 transition">
+      <i data-lucide="plus" class="w-5 h-5"></i>
+      <span>Action</span>
+    </button>
+  </div>
+
   <!-- ================= MODALS SECTION ================= -->
 
   <!-- 1. ADD / EDIT BANK OR WALLET ACCOUNT MODAL -->
-  <div id="account-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+  <div id="account-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 sm:border-slate-700/80 rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92dvh] sm:max-h-[90vh] flex flex-col animate-in">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
         <div class="flex items-center gap-2.5">
           <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
             <i data-lucide="landmark" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 id="account-modal-title" class="text-lg font-bold text-white">Add Bank or Wallet</h3>
+            <h3 id="account-modal-title" class="text-base sm:text-lg font-bold text-white">Add Bank or Wallet</h3>
             <p id="account-modal-sub" class="text-xs text-slate-400">Track balance, logos, and actions for this account</p>
           </div>
         </div>
-        <button onclick="closeAddAccountModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+        <button onclick="closeAddAccountModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form id="add-account-form" onsubmit="handleAccountSubmit(event)" class="space-y-4" enctype="multipart/form-data">
+      <form id="add-account-form" onsubmit="handleAccountSubmit(event)" class="space-y-4 overflow-y-auto flex-1 pr-1" enctype="multipart/form-data">
         <input type="hidden" id="edit-account-id" name="account_id" value="">
         
         <!-- Account Name -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Account / Bank Name *</label>
-          <input type="text" id="account-name-input" name="name" required placeholder="e.g. Chase Bank, HDFC Salary, Main Wallet, Cash Reserve" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="account-name-input" name="name" required placeholder="e.g. Chase Bank, HDFC Salary, Main Wallet, Cash Reserve" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <!-- Account Type & Initial Balance Grid -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1.5">Account Type</label>
-            <select id="account-type-select" name="account_type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="account-type-select" name="account_type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="bank">Bank Account</option>
               <option value="wallet">Digital Wallet</option>
               <option value="card">Credit / Debit Card</option>
@@ -383,7 +387,7 @@
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1.5">Initial Balance *</label>
-            <input type="number" step="0.01" id="account-balance-input" name="initial_balance" required value="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="number" step="0.01" id="account-balance-input" name="initial_balance" required value="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
         </div>
 
@@ -422,15 +426,15 @@
             <!-- Custom Logo File Upload -->
             <div class="p-3 rounded-2xl bg-slate-800/60 border border-dashed border-slate-700 flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
-                <div id="custom-logo-preview" class="w-10 h-10 rounded-xl bg-slate-750 flex items-center justify-center text-slate-400 border border-slate-700 overflow-hidden">
+                <div id="custom-logo-preview" class="w-10 h-10 rounded-xl bg-slate-750 flex items-center justify-center text-slate-400 border border-slate-700 overflow-hidden shrink-0">
                   <i data-lucide="image" class="w-5 h-5"></i>
                 </div>
                 <div>
                   <span class="text-xs font-semibold text-slate-200 block">Or Upload Bank Logo Image</span>
-                  <span class="text-[11px] text-slate-400">PNG, JPG, SVG, WebP (Max 5MB)</span>
+                  <span class="text-[10px] sm:text-[11px] text-slate-400">PNG, JPG, SVG, WebP (Max 5MB)</span>
                 </div>
               </div>
-              <label class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-700 hover:bg-slate-650 text-slate-200 cursor-pointer transition border border-slate-600">
+              <label class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-700 hover:bg-slate-650 text-slate-200 cursor-pointer transition border border-slate-600 shrink-0">
                 Browse
                 <input type="file" name="logo_file" accept="image/*" onchange="previewLogoFile(event)" class="hidden">
               </label>
@@ -444,7 +448,7 @@
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Card Accent Color</label>
           <div class="flex items-center gap-2">
             <input type="color" id="account-color-input" name="color" value="#4f46e5" class="h-9 w-12 bg-transparent cursor-pointer rounded-lg">
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
               <button type="button" onclick="setAccountColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 border border-white/20"></button>
               <button type="button" onclick="setAccountColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border border-white/20"></button>
               <button type="button" onclick="setAccountColor('#8b5cf6')" class="w-6 h-6 rounded-full bg-purple-500 border border-white/20"></button>
@@ -456,7 +460,7 @@
         </div>
 
         <!-- Form Actions -->
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800 shrink-0">
           <button type="button" onclick="closeAddAccountModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">
             Cancel
           </button>
@@ -469,33 +473,33 @@
     </div>
   </div>
 
-  <!-- 2. ADD / EDIT TRANSACTION MODAL (CREDIT / DEBIT + CHOOSE ACCOUNT) -->
-  <div id="tx-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in">
+  <!-- 2. ADD / EDIT TRANSACTION MODAL -->
+  <div id="tx-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 sm:border-slate-700/80 rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92dvh] sm:max-h-[90vh] flex flex-col animate-in">
       
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
         <div class="flex items-center gap-2.5">
           <div id="tx-modal-icon-badge" class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
             <i data-lucide="plus-circle" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 id="tx-modal-title" class="text-lg font-bold text-white">Record Transaction</h3>
+            <h3 id="tx-modal-title" class="text-base sm:text-lg font-bold text-white">Record Transaction</h3>
             <p id="tx-modal-date-display" class="text-xs text-indigo-400 font-semibold font-mono">Date: 2026-10-03</p>
           </div>
         </div>
-        <button onclick="closeAddTransactionModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+        <button onclick="closeAddTransactionModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form id="add-tx-form" onsubmit="handleTransactionSubmit(event)" class="space-y-4">
+      <form id="add-tx-form" onsubmit="handleTransactionSubmit(event)" class="space-y-4 overflow-y-auto flex-1 pr-1">
         <input type="hidden" id="edit-tx-id" name="tx_id" value="">
         <input type="hidden" id="tx-date-input" name="date" value="">
 
         <!-- Transaction Type Switcher: Credit vs Debit -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Action Type *</label>
-          <div class="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-slate-800 border border-slate-700">
+          <div class="grid grid-cols-2 gap-2 sm:gap-3 p-1 rounded-2xl bg-slate-800 border border-slate-700">
             <label class="cursor-pointer">
               <input type="radio" id="tx-type-debit" name="type" value="debit" checked onchange="toggleTxType('debit')" class="hidden peer">
               <div class="peer-checked:bg-rose-500 peer-checked:text-white py-2.5 text-center font-bold text-xs rounded-xl text-slate-300 flex items-center justify-center gap-1.5 transition">
@@ -516,7 +520,7 @@
         <!-- Choose Account (Bank / Wallet) -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Choose Bank / Wallet Account *</label>
-          <select id="tx-account-select" name="account_id" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer font-medium">
+          <select id="tx-account-select" name="account_id" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer font-medium">
             <!-- Populated dynamically with account logos & names -->
           </select>
         </div>
@@ -527,7 +531,7 @@
             <label class="block text-xs font-semibold text-slate-300 mb-1.5">Amount *</label>
             <div class="relative">
               <span id="tx-currency-symbol" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono">₹</span>
-              <input type="number" step="0.01" min="0.01" id="tx-amount-input" name="amount" required placeholder="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <input type="number" step="0.01" min="0.01" id="tx-amount-input" name="amount" required placeholder="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3.5 py-2.5 text-base sm:text-sm font-mono font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
           </div>
           <div>
@@ -535,7 +539,7 @@
               <label class="text-xs font-semibold text-slate-300">Category</label>
               <button type="button" onclick="openCategoryModal()" class="text-[11px] text-indigo-400 hover:underline">+ New Category</button>
             </div>
-            <select id="tx-category-select" name="category_id" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+            <select id="tx-category-select" name="category_id" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
               <!-- Populated dynamically based on Credit or Debit -->
             </select>
           </div>
@@ -544,11 +548,11 @@
         <!-- Description / Note -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Description / Note</label>
-          <input type="text" id="tx-description-input" name="description" placeholder="e.g. Grocery shopping, Client invoice, Dinner" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="tx-description-input" name="description" placeholder="e.g. Grocery shopping, Client invoice, Dinner" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <!-- Form Actions -->
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800 shrink-0">
           <button type="button" onclick="closeAddTransactionModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">
             Cancel
           </button>
@@ -562,31 +566,31 @@
   </div>
 
   <!-- 3. CATEGORY MANAGER MODAL -->
-  <div id="category-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 animate-in max-h-[90vh] flex flex-col">
+  <div id="category-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 sm:border-slate-700/80 rounded-t-3xl sm:rounded-3xl max-w-xl w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92dvh] sm:max-h-[90vh] flex flex-col animate-in">
       
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
         <div class="flex items-center gap-2.5">
           <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
             <i data-lucide="tags" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Categories Management</h3>
+            <h3 class="text-base sm:text-lg font-bold text-white">Categories Management</h3>
             <p class="text-xs text-slate-400">Organize your Credit (Income) and Debit (Expense) streams</p>
           </div>
         </div>
-        <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+        <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Add New Category Subform -->
-      <form id="add-category-form" onsubmit="handleCategorySubmit(event)" class="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/80 space-y-3">
+      <form id="add-category-form" onsubmit="handleCategorySubmit(event)" class="p-3 sm:p-4 rounded-2xl bg-slate-800/60 border border-slate-700/80 space-y-3 shrink-0">
         <span class="text-xs font-bold text-slate-200 uppercase tracking-wider block">Create New Category</span>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <input type="text" id="new-cat-name" required placeholder="Category name" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <input type="text" id="new-cat-name" required placeholder="Category name" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           
-          <select id="new-cat-type" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <select id="new-cat-type" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-base sm:text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="debit">Debit (Expense)</option>
             <option value="credit">Credit (Income)</option>
             <option value="both">Both</option>
@@ -602,22 +606,22 @@
         </div>
 
         <!-- Quick Emoji Picker -->
-        <div class="flex items-center gap-2 pt-1 overflow-x-auto text-base">
-          <span class="text-[10px] text-slate-400 shrink-0 font-medium">Quick Emoji:</span>
-          <button type="button" onclick="selectCatEmoji('🍔')" class="hover:scale-125 transition">🍔</button>
-          <button type="button" onclick="selectCatEmoji('🛒')" class="hover:scale-125 transition">🛒</button>
-          <button type="button" onclick="selectCatEmoji('🛍️')" class="hover:scale-125 transition">🛍️</button>
-          <button type="button" onclick="selectCatEmoji('💡')" class="hover:scale-125 transition">💡</button>
-          <button type="button" onclick="selectCatEmoji('🚗')" class="hover:scale-125 transition">🚗</button>
-          <button type="button" onclick="selectCatEmoji('🎬')" class="hover:scale-125 transition">🎬</button>
-          <button type="button" onclick="selectCatEmoji('💊')" class="hover:scale-125 transition">💊</button>
-          <button type="button" onclick="selectCatEmoji('🏠')" class="hover:scale-125 transition">🏠</button>
-          <button type="button" onclick="selectCatEmoji('✈️')" class="hover:scale-125 transition">✈️</button>
-          <button type="button" onclick="selectCatEmoji('💼')" class="hover:scale-125 transition">💼</button>
-          <button type="button" onclick="selectCatEmoji('💻')" class="hover:scale-125 transition">💻</button>
-          <button type="button" onclick="selectCatEmoji('📈')" class="hover:scale-125 transition">📈</button>
-          <button type="button" onclick="selectCatEmoji('🎁')" class="hover:scale-125 transition">🎁</button>
-          <button type="button" onclick="selectCatEmoji('💰')" class="hover:scale-125 transition">💰</button>
+        <div class="flex items-center gap-2 pt-1 overflow-x-auto text-base no-scrollbar touch-pan-x">
+          <span class="text-[10px] text-slate-400 shrink-0 font-medium">Quick:</span>
+          <button type="button" onclick="selectCatEmoji('🍔')" class="hover:scale-125 transition p-1">🍔</button>
+          <button type="button" onclick="selectCatEmoji('🛒')" class="hover:scale-125 transition p-1">🛒</button>
+          <button type="button" onclick="selectCatEmoji('🛍️')" class="hover:scale-125 transition p-1">🛍️</button>
+          <button type="button" onclick="selectCatEmoji('💡')" class="hover:scale-125 transition p-1">💡</button>
+          <button type="button" onclick="selectCatEmoji('🚗')" class="hover:scale-125 transition p-1">🚗</button>
+          <button type="button" onclick="selectCatEmoji('🎬')" class="hover:scale-125 transition p-1">🎬</button>
+          <button type="button" onclick="selectCatEmoji('💊')" class="hover:scale-125 transition p-1">💊</button>
+          <button type="button" onclick="selectCatEmoji('🏠')" class="hover:scale-125 transition p-1">🏠</button>
+          <button type="button" onclick="selectCatEmoji('✈️')" class="hover:scale-125 transition p-1">✈️</button>
+          <button type="button" onclick="selectCatEmoji('💼')" class="hover:scale-125 transition p-1">💼</button>
+          <button type="button" onclick="selectCatEmoji('💻')" class="hover:scale-125 transition p-1">💻</button>
+          <button type="button" onclick="selectCatEmoji('📈')" class="hover:scale-125 transition p-1">📈</button>
+          <button type="button" onclick="selectCatEmoji('🎁')" class="hover:scale-125 transition p-1">🎁</button>
+          <button type="button" onclick="selectCatEmoji('💰')" class="hover:scale-125 transition p-1">💰</button>
         </div>
       </form>
 
@@ -626,7 +630,7 @@
         <!-- Debits Category List -->
         <div>
           <span class="text-xs font-bold text-rose-400 uppercase tracking-wider block mb-2">Expense Categories (Debit)</span>
-          <div id="debit-categories-list" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div id="debit-categories-list" class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2">
             <!-- Injected by JS -->
           </div>
         </div>
@@ -634,14 +638,14 @@
         <!-- Credits Category List -->
         <div>
           <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-2">Income Categories (Credit)</span>
-          <div id="credit-categories-list" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div id="credit-categories-list" class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2">
             <!-- Injected by JS -->
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end pt-3 border-t border-slate-800">
-        <button onclick="closeCategoryModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white transition">
+      <div class="flex justify-end pt-3 border-t border-slate-800 shrink-0">
+        <button onclick="closeCategoryModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white transition">
           Done
         </button>
       </div>
@@ -651,12 +655,12 @@
 
   <!-- 4. FUTURE DATE LOCKED MODAL (ALERT USER) -->
   <div id="locked-date-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4 animate-in">
-      <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto ring-1 ring-amber-500/20">
-        <i data-lucide="lock" class="w-7 h-7"></i>
+    <div class="bg-slate-900 border border-slate-700/80 rounded-2xl sm:rounded-3xl max-w-sm w-full p-5 sm:p-6 shadow-2xl text-center space-y-4 animate-in">
+      <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto ring-1 ring-amber-500/20">
+        <i data-lucide="lock" class="w-6 h-6 sm:w-7 sm:h-7"></i>
       </div>
       <div>
-        <h3 class="text-lg font-bold text-white">Date is Locked!</h3>
+        <h3 class="text-base sm:text-lg font-bold text-white">Date is Locked!</h3>
         <p id="locked-modal-msg" class="text-xs text-slate-400 mt-1 leading-relaxed">
           You selected a future date. In accordance with system policy, dates unlock strictly on or before that day. You can view the date, but cannot add any expenses or incomes ahead of time.
         </p>
@@ -668,34 +672,34 @@
   </div>
 
   <!-- ================= 4-DIGIT PIN AUTHENTICATION OVERLAY ================= -->
-  <div id="pin-auth-modal" class="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-2xl hidden transition-all duration-300">
-    <div class="relative w-full max-w-sm sm:max-w-md bg-slate-900/95 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/60 backdrop-blur-xl text-center space-y-5 animate-in">
+  <div id="pin-auth-modal" class="fixed inset-0 z-[999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-2xl hidden transition-all duration-300">
+    <div class="relative w-full max-w-sm sm:max-w-md bg-slate-900/95 border border-slate-700/80 rounded-3xl p-5 sm:p-8 shadow-2xl shadow-indigo-950/60 backdrop-blur-xl text-center space-y-4 sm:space-y-5 animate-in max-h-[96dvh] overflow-y-auto">
       
       <!-- Top Decorative Glow -->
       <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-20 bg-indigo-500/20 blur-2xl rounded-full pointer-events-none"></div>
 
       <!-- Icon & Branding -->
-      <div class="flex flex-col items-center gap-2.5">
-        <div id="pin-lock-icon-container" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/20 transition-all duration-300">
-          <i id="pin-lock-icon" data-lucide="lock" class="w-8 h-8 text-white transition-all duration-300"></i>
+      <div class="flex flex-col items-center gap-2">
+        <div id="pin-lock-icon-container" class="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-4 ring-indigo-500/20 transition-all duration-300">
+          <i id="pin-lock-icon" data-lucide="lock" class="w-6 h-6 sm:w-8 sm:h-8 text-white transition-all duration-300"></i>
         </div>
         <div>
           <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">FinTrack<span class="text-indigo-400">Pro</span></h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Enter your 4-digit security PIN to unlock</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1">Enter your 4-digit security PIN to unlock</p>
         </div>
       </div>
 
       <!-- PIN Input Boxes (4 Digits) -->
-      <div class="space-y-2">
-        <div id="pin-inputs-wrapper" class="flex items-center justify-center gap-3 sm:gap-3.5 transition-transform duration-200">
-          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="0" autofocus />
-          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="1" />
-          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="2" />
-          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="3" />
+      <div class="space-y-1.5 sm:space-y-2">
+        <div id="pin-inputs-wrapper" class="flex items-center justify-center gap-2.5 sm:gap-3.5 transition-transform duration-200">
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-13 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="0" autofocus />
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-13 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="1" />
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-13 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="2" />
+          <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]*" class="pin-digit-box w-12 h-13 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold font-mono bg-slate-800/80 border-2 border-slate-700 text-white rounded-2xl shadow-inner focus:border-indigo-500 focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 transition outline-none cursor-pointer" autocomplete="off" data-index="3" />
         </div>
 
         <!-- Feedback & Error Message -->
-        <div id="pin-feedback" class="h-5 flex items-center justify-center text-xs font-semibold text-rose-400 opacity-0 transition-opacity">
+        <div id="pin-feedback" class="h-4 sm:h-5 flex items-center justify-center text-xs font-semibold text-rose-400 opacity-0 transition-opacity">
           <!-- Text inserted by JS -->
         </div>
 
@@ -709,42 +713,39 @@
       </div>
 
       <!-- Keypad (Clickable on desktop & tap on mobile) -->
-      <div class="grid grid-cols-3 gap-2 max-w-[260px] mx-auto pt-1">
-        <button type="button" onclick="handleKeypadPress('1')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">1</button>
-        <button type="button" onclick="handleKeypadPress('2')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">2</button>
-        <button type="button" onclick="handleKeypadPress('3')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">3</button>
+      <div class="grid grid-cols-3 gap-2 max-w-[260px] mx-auto pt-0.5 sm:pt-1">
+        <button type="button" onclick="handleKeypadPress('1')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">1</button>
+        <button type="button" onclick="handleKeypadPress('2')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">2</button>
+        <button type="button" onclick="handleKeypadPress('3')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">3</button>
         
-        <button type="button" onclick="handleKeypadPress('4')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">4</button>
-        <button type="button" onclick="handleKeypadPress('5')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">5</button>
-        <button type="button" onclick="handleKeypadPress('6')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">6</button>
+        <button type="button" onclick="handleKeypadPress('4')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">4</button>
+        <button type="button" onclick="handleKeypadPress('5')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">5</button>
+        <button type="button" onclick="handleKeypadPress('6')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">6</button>
         
-        <button type="button" onclick="handleKeypadPress('7')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">7</button>
-        <button type="button" onclick="handleKeypadPress('8')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">8</button>
-        <button type="button" onclick="handleKeypadPress('9')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">9</button>
+        <button type="button" onclick="handleKeypadPress('7')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">7</button>
+        <button type="button" onclick="handleKeypadPress('8')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">8</button>
+        <button type="button" onclick="handleKeypadPress('9')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">9</button>
         
         <button type="button" onclick="handleKeypadPress('clear')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/50 shadow-sm transition active:scale-95">Clear</button>
-        <button type="button" onclick="handleKeypadPress('0')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">0</button>
+        <button type="button" onclick="handleKeypadPress('0')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 active:bg-indigo-600 text-lg sm:text-xl font-bold text-slate-100 border border-slate-700/60 shadow-sm transition active:scale-95">0</button>
         <button type="button" onclick="handleKeypadPress('backspace')" class="keypad-btn h-11 sm:h-12 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 text-slate-400 hover:text-rose-400 border border-slate-700/50 shadow-sm flex items-center justify-center transition active:scale-95" title="Backspace">
           <i data-lucide="delete" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Security Notice & Default PIN info -->
+      <!-- Security Notice -->
       <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
         <span class="flex items-center gap-1">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-400"></i>
           Tab Session Protected
         </span>
-        <!-- <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full font-mono font-medium">
-          PIN: 1234
-        </span> -->
       </div>
 
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- Toast Notification Container (Responsive: Centered on mobile, bottom-right on desktop) -->
+  <div id="toast-container" class="fixed bottom-5 inset-x-4 sm:inset-x-auto sm:right-6 sm:bottom-6 z-50 flex flex-col items-center sm:items-end gap-2 pointer-events-none"></div>
 
   <!-- Application Logic -->
   <script src="/static/js/app.js"></script>
