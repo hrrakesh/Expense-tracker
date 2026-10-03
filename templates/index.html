@@ -74,31 +74,27 @@
       <div class="hidden md:flex items-center gap-6 px-4 py-1.5 rounded-2xl bg-slate-800/50 border border-slate-700/60 shadow-inner">
         <div>
           <span class="text-[11px] text-slate-400 font-medium block">Total Net Worth</span>
-          <span id="nav-net-worth" class="font-bold font-mono text-sm text-slate-100">$0.00</span>
+          <span id="nav-net-worth" class="font-bold font-mono text-sm text-slate-100">₹0.00</span>
         </div>
         <div class="h-6 w-px bg-slate-700/80"></div>
         <div>
           <span class="text-[11px] text-slate-400 font-medium block">Month Inflow</span>
-          <span id="nav-month-credit" class="font-bold font-mono text-sm text-emerald-400">+$0.00</span>
+          <span id="nav-month-credit" class="font-bold font-mono text-sm text-emerald-400">+₹0.00</span>
         </div>
         <div class="h-6 w-px bg-slate-700/80"></div>
         <div>
           <span class="text-[11px] text-slate-400 font-medium block">Month Outflow</span>
-          <span id="nav-month-debit" class="font-bold font-mono text-sm text-rose-400">-$0.00</span>
+          <span id="nav-month-debit" class="font-bold font-mono text-sm text-rose-400">-₹0.00</span>
         </div>
       </div>
 
       <!-- Header Actions -->
       <div class="flex items-center gap-2.5">
-        <!-- Currency Selector -->
-        <select id="currency-select" class="bg-slate-800 border border-slate-700 text-xs font-semibold rounded-xl px-2.5 py-2 text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer transition">
-          <option value="₹"selected >INR (₹)</option>
-          <!-- <option value="$" >USD ($)</option>
-          <option value="€">EUR (€)</option>
-          <option value="£">GBP (£)</option>
-          <option value="¥">JPY (¥)</option>
-          <option value="AED">AED</option> -->
-        </select>
+        <!-- Currency Badge (INR ₹) -->
+        <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200">
+          <span class="text-indigo-400 font-mono text-sm">₹</span>
+          <span>INR</span>
+        </div>
 
         <!-- Manage Categories Button -->
         <button onclick="openCategoryModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 hover:border-slate-600 transition shadow-sm">
@@ -194,15 +190,15 @@
         <div class="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-800/40 to-slate-800/80 border border-slate-700/60">
           <div class="text-center sm:text-left">
             <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Month Inflows</span>
-            <span id="cal-month-credit" class="text-sm sm:text-base font-bold font-mono text-emerald-400">+$0.00</span>
+            <span id="cal-month-credit" class="text-sm sm:text-base font-bold font-mono text-emerald-400">+₹0.00</span>
           </div>
           <div class="text-center">
             <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Month Expenses</span>
-            <span id="cal-month-debit" class="text-sm sm:text-base font-bold font-mono text-rose-400">-$0.00</span>
+            <span id="cal-month-debit" class="text-sm sm:text-base font-bold font-mono text-rose-400">-₹0.00</span>
           </div>
           <div class="text-center sm:text-right">
             <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">Net Balance</span>
-            <span id="cal-month-net" class="text-sm sm:text-base font-bold font-mono text-slate-200">$0.00</span>
+            <span id="cal-month-net" class="text-sm sm:text-base font-bold font-mono text-slate-200">₹0.00</span>
           </div>
         </div>
 
@@ -269,7 +265,7 @@
                 <i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>
               </div>
             </div>
-            <div id="day-total-credit" class="text-lg font-black font-mono text-emerald-400">+$0.00</div>
+            <div id="day-total-credit" class="text-lg font-black font-mono text-emerald-400">+₹0.00</div>
             <span class="text-[10px] text-emerald-400/70 font-medium">Money Inflow</span>
           </div>
 
@@ -281,7 +277,7 @@
                 <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
               </div>
             </div>
-            <div id="day-total-debit" class="text-lg font-black font-mono text-rose-400">-$0.00</div>
+            <div id="day-total-debit" class="text-lg font-black font-mono text-rose-400">-₹0.00</div>
             <span class="text-[10px] text-rose-400/70 font-medium">Money Outflow</span>
           </div>
         </div>
@@ -289,7 +285,7 @@
         <!-- Day Net Summary Bar -->
         <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between text-xs">
           <span class="text-slate-400 font-semibold">Day Net Balance</span>
-          <span id="day-net-balance" class="font-mono font-bold text-slate-100">$0.00</span>
+          <span id="day-net-balance" class="font-mono font-bold text-slate-100">₹0.00</span>
         </div>
 
         <!-- Transactions Filter Tabs for Selected Date -->
@@ -331,8 +327,8 @@
             <i data-lucide="landmark" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Add Bank or Wallet</h3>
-            <p class="text-xs text-slate-400">Track balance, logos, and actions for this account</p>
+            <h3 id="account-modal-title" class="text-lg font-bold text-white">Add Bank or Wallet</h3>
+            <p id="account-modal-sub" class="text-xs text-slate-400">Track balance, logos, and actions for this account</p>
           </div>
         </div>
         <button onclick="closeAddAccountModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
@@ -341,18 +337,19 @@
       </div>
 
       <form id="add-account-form" onsubmit="handleAccountSubmit(event)" class="space-y-4" enctype="multipart/form-data">
+        <input type="hidden" id="edit-account-id" name="account_id" value="">
         
         <!-- Account Name -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Account / Bank Name *</label>
-          <input type="text" name="name" required placeholder="e.g. Chase Bank, HDFC Salary, Main Wallet, Cash Reserve" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="account-name-input" name="name" required placeholder="e.g. Chase Bank, HDFC Salary, Main Wallet, Cash Reserve" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <!-- Account Type & Initial Balance Grid -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1.5">Account Type</label>
-            <select name="account_type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="account-type-select" name="account_type" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="bank">Bank Account</option>
               <option value="wallet">Digital Wallet</option>
               <option value="card">Credit / Debit Card</option>
@@ -361,7 +358,7 @@
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1.5">Initial Balance *</label>
-            <input type="number" step="0.01" name="initial_balance" required value="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="number" step="0.01" id="account-balance-input" name="initial_balance" required value="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
         </div>
 
@@ -421,7 +418,7 @@
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Card Accent Color</label>
           <div class="flex items-center gap-2">
-            <input type="color" name="color" value="#4f46e5" class="h-9 w-12 bg-transparent cursor-pointer rounded-lg">
+            <input type="color" id="account-color-input" name="color" value="#4f46e5" class="h-9 w-12 bg-transparent cursor-pointer rounded-lg">
             <div class="flex items-center gap-1.5">
               <button type="button" onclick="setAccountColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 border border-white/20"></button>
               <button type="button" onclick="setAccountColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border border-white/20"></button>
@@ -438,7 +435,7 @@
           <button type="button" onclick="closeAddAccountModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">
             Cancel
           </button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition">
+          <button id="account-submit-btn" type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition">
             Save Account
           </button>
         </div>
@@ -447,7 +444,7 @@
     </div>
   </div>
 
-  <!-- 2. ADD TRANSACTION MODAL (CREDIT / DEBIT + CHOOSE ACCOUNT) -->
+  <!-- 2. ADD / EDIT TRANSACTION MODAL (CREDIT / DEBIT + CHOOSE ACCOUNT) -->
   <div id="tx-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in">
       
@@ -457,7 +454,7 @@
             <i data-lucide="plus-circle" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Record Transaction</h3>
+            <h3 id="tx-modal-title" class="text-lg font-bold text-white">Record Transaction</h3>
             <p id="tx-modal-date-display" class="text-xs text-indigo-400 font-semibold font-mono">Date: 2026-10-03</p>
           </div>
         </div>
@@ -467,6 +464,7 @@
       </div>
 
       <form id="add-tx-form" onsubmit="handleTransactionSubmit(event)" class="space-y-4">
+        <input type="hidden" id="edit-tx-id" name="tx_id" value="">
         <input type="hidden" id="tx-date-input" name="date" value="">
 
         <!-- Transaction Type Switcher: Credit vs Debit -->
@@ -474,14 +472,14 @@
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Action Type *</label>
           <div class="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-slate-800 border border-slate-700">
             <label class="cursor-pointer">
-              <input type="radio" name="type" value="debit" checked onchange="toggleTxType('debit')" class="hidden peer">
+              <input type="radio" id="tx-type-debit" name="type" value="debit" checked onchange="toggleTxType('debit')" class="hidden peer">
               <div class="peer-checked:bg-rose-500 peer-checked:text-white py-2.5 text-center font-bold text-xs rounded-xl text-slate-300 flex items-center justify-center gap-1.5 transition">
                 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
                 <span>Debit (Expense)</span>
               </div>
             </label>
             <label class="cursor-pointer">
-              <input type="radio" name="type" value="credit" onchange="toggleTxType('credit')" class="hidden peer">
+              <input type="radio" id="tx-type-credit" name="type" value="credit" onchange="toggleTxType('credit')" class="hidden peer">
               <div class="peer-checked:bg-emerald-500 peer-checked:text-white py-2.5 text-center font-bold text-xs rounded-xl text-slate-300 flex items-center justify-center gap-1.5 transition">
                 <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
                 <span>Credit (Income)</span>
@@ -503,7 +501,7 @@
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1.5">Amount *</label>
             <div class="relative">
-              <span id="tx-currency-symbol" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+              <span id="tx-currency-symbol" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono">₹</span>
               <input type="number" step="0.01" min="0.01" id="tx-amount-input" name="amount" required placeholder="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
           </div>
@@ -521,7 +519,7 @@
         <!-- Description / Note -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Description / Note</label>
-          <input type="text" name="description" placeholder="e.g. Grocery shopping, Client invoice, Dinner" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="tx-description-input" name="description" placeholder="e.g. Grocery shopping, Client invoice, Dinner" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <!-- Form Actions -->

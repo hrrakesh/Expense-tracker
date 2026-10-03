@@ -89,17 +89,6 @@ def init_db():
             VALUES (?, ?, ?, ?)
         """, default_categories)
 
-    # Check if accounts table is empty, seed 2 starter accounts
-    cursor.execute("SELECT COUNT(*) FROM accounts")
-    if cursor.fetchone()[0] == 0:
-        default_accounts = [
-            ('Main Checking Account', 'bank', 2500.00, 'preset_bank', '#3B82F6'),
-            ('Digital Wallet', 'wallet', 450.00, 'preset_wallet', '#8B5CF6')
-        ]
-        cursor.executemany("""
-            INSERT INTO accounts (name, account_type, initial_balance, logo, color)
-            VALUES (?, ?, ?, ?, ?)
-        """, default_accounts)
 
     conn.commit()
     conn.close()

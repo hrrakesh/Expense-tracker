@@ -72,6 +72,58 @@ def add_account():
 
     return jsonify({'success': True, 'id': new_id, 'message': 'Account created successfully!'}), 201
 
+@app.route('/api/accounts/<int:account_id>', methods=['PUT', 'POST'])
+def update_account(account_id):
+    conn = database.get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM accounts WHERE id = ?", (account_id,))
+    account = cursor.fetchone()
+    if not account:
+        conn.close()
+        return jsonify({'error': 'Account not found'}), 404
+
+    name = request.form.get('name', account['name']).strip()
+    account_type = request.form.get('account_type', account['account_type'])
+    color = request.form.get('color', account['color'])
+    preset_logo = request.form.get('preset_logo', '')
+    
+    try:
+        initial_balance = float(request.form.get('initial_balance', account['initial_balance']))
+    except ValueError:
+        initial_balance = account['initial_balance']
+
+    if not name:
+        return jsonify({'error': 'Account name cannot be empty'}), 400
+
+    logo_path = account['logo']
+    if preset_logo:
+        logo_path = preset_logo
+
+    if 'logo_file' in request.files:
+        file = request.files['logo_file']
+        if file and file.filename != '' and allowed_file(file.filename):
+            filename = f"account_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(save_path)
+            if account['logo'] and account['logo'].startswith('/static/uploads/logos/'):
+                old_file = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(account['logo']))
+                if os.path.exists(old_file):
+                    try:
+                        os.remove(old_file)
+                    except OSError:
+                        pass
+            logo_path = f"/static/uploads/logos/{filename}"
+
+    cursor.execute("""
+        UPDATE accounts
+        SET name = ?, account_type = ?, initial_balance = ?, logo = ?, color = ?
+        WHERE id = ?
+    """, (name, account_type, initial_balance, logo_path, color, account_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True, 'message': f'Account "{name}" updated successfully!'})
+
 @app.route('/api/accounts/<int:account_id>', methods=['DELETE'])
 def delete_account(account_id):
     conn = database.get_db()
@@ -284,6 +336,64 @@ def add_transaction():
         'id': new_id,
         'message': f"{tx_type.capitalize()} of ₹{amount:,.2f} recorded successfully!"
     }), 201
+
+@app.route('/api/transactions/<int:tx_id>', methods=['PUT'])
+def update_transaction(tx_id):
+    conn = database.get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM transactions WHERE id = ?", (tx_id,))
+    tx = cursor.fetchone()
+    if not tx:
+        conn.close()
+        return jsonify({'error': 'Transaction not found'}), 404
+
+    data = request.get_json() or {}
+    account_id = data.get('account_id', tx['account_id'])
+    category_id = data.get('category_id') or None
+    tx_type = data.get('type', tx['type'])
+    tx_date = data.get('date', tx['date'])
+    description = data.get('description', tx['description']).strip()
+    time_str = data.get('time', tx['time'])
+
+    today_str = date.today().isoformat()
+
+    if not tx_date:
+        return jsonify({'error': 'Transaction date is required'}), 400
+
+    if tx_date < '2026-10-01':
+        return jsonify({'error': 'Dates prior to October 2026 are not accessible.'}), 400
+
+    if tx_date > today_str:
+        return jsonify({'error': f'Date {tx_date} is locked! You can only record transactions for today ({today_str}) or past dates.'}), 400
+
+    if tx_type not in ('credit', 'debit'):
+        return jsonify({'error': 'Transaction type must be credit or debit'}), 400
+
+    try:
+        amount = float(data.get('amount', tx['amount']))
+        if amount <= 0:
+            return jsonify({'error': 'Amount must be greater than zero'}), 400
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Invalid amount value'}), 400
+
+    # Check account exists
+    cursor.execute("SELECT id FROM accounts WHERE id = ?", (account_id,))
+    if not cursor.fetchone():
+        conn.close()
+        return jsonify({'error': 'Selected account does not exist'}), 404
+
+    cursor.execute("""
+        UPDATE transactions
+        SET account_id = ?, category_id = ?, type = ?, amount = ?, date = ?, time = ?, description = ?
+        WHERE id = ?
+    """, (account_id, category_id, tx_type, amount, tx_date, time_str, description, tx_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'success': True,
+        'message': f"Transaction updated successfully!"
+    })
 
 @app.route('/api/transactions/<int:tx_id>', methods=['DELETE'])
 def delete_transaction(tx_id):

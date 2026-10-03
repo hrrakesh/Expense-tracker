@@ -12,7 +12,7 @@ let monthSummaries = {};
 let dayTransactions = [];
 let currentDayFilter = 'all';
 let currentTxType = 'debit';
-let currentCurrency = '$';
+let currentCurrency = '₹';
 
 // Month names
 const MONTH_NAMES = [
@@ -24,25 +24,7 @@ const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', '
 
 // ------------------- INITIALIZATION -------------------
 document.addEventListener('DOMContentLoaded', async () => {
-  // Read currency preference from local storage if available
-  const savedCurrency = localStorage.getItem('fintrack_currency');
-  if (savedCurrency) {
-    currentCurrency = savedCurrency;
-    const currencySelect = document.getElementById('currency-select');
-    if (currencySelect) currencySelect.value = savedCurrency;
-  }
   updateCurrencySymbols();
-
-  // Setup currency change listener
-  document.getElementById('currency-select').addEventListener('change', (e) => {
-    currentCurrency = e.target.value;
-    localStorage.setItem('fintrack_currency', currentCurrency);
-    updateCurrencySymbols();
-    renderAccountsShelf();
-    loadCalendarMonth(currentYear, currentMonth);
-    loadDateDetails(selectedDate);
-    fetchOverviewStats();
-  });
 
   // Setup preset logo radio highlights
   document.querySelectorAll('input[name="preset_logo"]').forEach(radio => {
@@ -87,12 +69,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function updateCurrencySymbols() {
   const symbolEl = document.getElementById('tx-currency-symbol');
-  if (symbolEl) symbolEl.textContent = currentCurrency;
+  if (symbolEl) symbolEl.textContent = '₹';
 }
 
 function formatCurrency(amount) {
   const num = Number(amount) || 0;
-  return `${currentCurrency}${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function formatDateISO(d) {
@@ -207,9 +189,14 @@ function renderAccountsShelf() {
             </div>
           </div>
           
-          <button onclick="event.stopPropagation(); deleteAccount(${acc.id}, '${acc.name}')" title="Delete account" class="text-slate-500 hover:text-rose-400 p-1 rounded-lg hover:bg-slate-800 transition">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          </button>
+          <div class="flex items-center gap-1">
+            <button onclick="event.stopPropagation(); openEditAccountModal(${acc.id})" title="Edit account details and logo" class="text-slate-400 hover:text-indigo-400 p-1 rounded-lg hover:bg-slate-800 transition">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="event.stopPropagation(); deleteAccount(${acc.id}, '${acc.name}')" title="Delete account" class="text-slate-400 hover:text-rose-400 p-1 rounded-lg hover:bg-slate-800 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Middle: Dynamic Current Balance -->
@@ -683,14 +670,17 @@ function renderDayTransactions() {
           </div>
         </div>
 
-        <!-- Right: Amount & Delete Button -->
-        <div class="flex items-center gap-2.5 shrink-0">
+        <!-- Right: Amount & Action Buttons (Edit + Delete) -->
+        <div class="flex items-center gap-1.5 shrink-0">
           <div class="text-right">
             <span class="font-mono font-extrabold text-sm ${amountColor}">
               ${sign}${formatCurrency(tx.amount)}
             </span>
           </div>
-          <button onclick="deleteTransaction(${tx.id})" title="Delete entry" class="opacity-40 group-hover:opacity-100 text-slate-400 hover:text-rose-400 p-1 rounded-lg hover:bg-slate-750 transition">
+          <button onclick="openEditTransactionModal(${tx.id})" title="Edit transaction action" class="opacity-50 group-hover:opacity-100 text-slate-400 hover:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-750 transition">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+          </button>
+          <button onclick="deleteTransaction(${tx.id})" title="Delete entry" class="opacity-50 group-hover:opacity-100 text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-750 transition">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -722,21 +712,33 @@ async function deleteTransaction(txId) {
   }
 }
 
-// ------------------- ADD TRANSACTION MODAL & SUBMIT -------------------
+// ------------------- ADD / EDIT TRANSACTION MODAL & SUBMIT -------------------
 function openAddTransactionModal() {
   if (selectedDate > todayStr) {
     openLockedModal(selectedDate);
     return;
   }
 
+  if (!accountsList || accountsList.length === 0) {
+    showToast('Please add a bank or wallet account first!', 'info');
+    openAddAccountModal();
+    return;
+  }
+
   const modal = document.getElementById('tx-modal');
+  const editIdInput = document.getElementById('edit-tx-id');
+  const titleEl = document.getElementById('tx-modal-title');
   const dateInput = document.getElementById('tx-date-input');
   const dateDisplay = document.getElementById('tx-modal-date-display');
   const amountInput = document.getElementById('tx-amount-input');
+  const descInput = document.getElementById('tx-description-input');
 
+  if (editIdInput) editIdInput.value = '';
+  if (titleEl) titleEl.textContent = 'Record Transaction';
   if (dateInput) dateInput.value = selectedDate;
   if (dateDisplay) dateDisplay.textContent = `Date: ${selectedDate} (Unlocked)`;
   if (amountInput) amountInput.value = '';
+  if (descInput) descInput.value = '';
 
   // Select account if currently filtered
   const accountSelect = document.getElementById('tx-account-select');
@@ -749,6 +751,55 @@ function openAddTransactionModal() {
   if (window.lucide) lucide.createIcons();
 }
 
+function openEditTransactionModal(txId) {
+  const tx = dayTransactions.find(t => t.id === txId);
+  if (!tx) return;
+
+  const modal = document.getElementById('tx-modal');
+  const editIdInput = document.getElementById('edit-tx-id');
+  const titleEl = document.getElementById('tx-modal-title');
+  const dateInput = document.getElementById('tx-date-input');
+  const dateDisplay = document.getElementById('tx-modal-date-display');
+  const amountInput = document.getElementById('tx-amount-input');
+  const descInput = document.getElementById('tx-description-input');
+  const accountSelect = document.getElementById('tx-account-select');
+  const submitBtn = document.getElementById('tx-submit-btn');
+
+  if (editIdInput) editIdInput.value = tx.id;
+  if (titleEl) titleEl.textContent = `Edit ${tx.type.toUpperCase()} Action`;
+  if (dateInput) dateInput.value = tx.date;
+  if (dateDisplay) dateDisplay.textContent = `Date: ${tx.date} (Unlocked)`;
+  if (amountInput) amountInput.value = tx.amount;
+  if (descInput) descInput.value = tx.description || '';
+
+  // Select account
+  if (accountSelect) accountSelect.value = tx.account_id;
+
+  // Toggle type and select category
+  const debitRadio = document.getElementById('tx-type-debit');
+  const creditRadio = document.getElementById('tx-type-credit');
+  if (tx.type === 'credit') {
+    if (creditRadio) creditRadio.checked = true;
+    toggleTxType('credit');
+  } else {
+    if (debitRadio) debitRadio.checked = true;
+    toggleTxType('debit');
+  }
+
+  // Pre-select category after populateCategorySelect
+  const categorySelect = document.getElementById('tx-category-select');
+  if (categorySelect && tx.category_id) {
+    categorySelect.value = tx.category_id;
+  }
+
+  if (submitBtn) {
+    submitBtn.textContent = 'Update Action';
+  }
+
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
 function closeAddTransactionModal() {
   document.getElementById('tx-modal').classList.add('hidden');
 }
@@ -757,13 +808,14 @@ function toggleTxType(type) {
   currentTxType = type;
   const submitBtn = document.getElementById('tx-submit-btn');
   const iconBadge = document.getElementById('tx-modal-icon-badge');
+  const isEditing = Boolean(document.getElementById('edit-tx-id').value);
 
   if (type === 'credit') {
-    submitBtn.textContent = 'Save Credit Action (Income)';
+    submitBtn.textContent = isEditing ? 'Update Credit Action' : 'Save Credit Action (Income)';
     submitBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg transition';
     iconBadge.className = 'p-2 rounded-xl bg-emerald-500/10 text-emerald-400';
   } else {
-    submitBtn.textContent = 'Save Debit Action (Expense)';
+    submitBtn.textContent = isEditing ? 'Update Debit Action' : 'Save Debit Action (Expense)';
     submitBtn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-lg transition';
     iconBadge.className = 'p-2 rounded-xl bg-rose-500/10 text-rose-400';
   }
@@ -793,9 +845,15 @@ async function handleTransactionSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const formData = new FormData(form);
+  const editId = document.getElementById('edit-tx-id').value;
+  const accountId = parseInt(formData.get('account_id'));
+  if (!accountId || isNaN(accountId)) {
+    showToast('Please select or create an account first', 'warning');
+    return;
+  }
 
   const payload = {
-    account_id: parseInt(formData.get('account_id')),
+    account_id: accountId,
     category_id: formData.get('category_id') ? parseInt(formData.get('category_id')) : null,
     type: formData.get('type'),
     amount: parseFloat(formData.get('amount')),
@@ -804,15 +862,23 @@ async function handleTransactionSubmit(e) {
   };
 
   try {
-    const res = await fetch('/api/transactions', {
-      method: 'POST',
+    let url = '/api/transactions';
+    let method = 'POST';
+
+    if (editId) {
+      url = `/api/transactions/${editId}`;
+      method = 'PUT';
+    }
+
+    const res = await fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
 
     if (res.ok) {
-      showToast(data.message || 'Transaction recorded!', 'success');
+      showToast(data.message || (editId ? 'Transaction updated!' : 'Transaction recorded!'), 'success');
       closeAddTransactionModal();
       form.reset();
       
@@ -822,7 +888,7 @@ async function handleTransactionSubmit(e) {
       await loadDateDetails(selectedDate);
       await fetchOverviewStats();
     } else {
-      showToast(data.error || 'Failed to add transaction', 'error');
+      showToast(data.error || 'Failed to save transaction', 'error');
     }
   } catch (err) {
     showToast('Network error while saving transaction', 'error');
@@ -831,6 +897,70 @@ async function handleTransactionSubmit(e) {
 
 // ------------------- ACCOUNTS MODAL & SUBMIT -------------------
 function openAddAccountModal() {
+  const form = document.getElementById('add-account-form');
+  if (form) form.reset();
+
+  document.getElementById('edit-account-id').value = '';
+  document.getElementById('account-modal-title').textContent = 'Add Bank or Wallet';
+  document.getElementById('account-modal-sub').textContent = 'Track balance, logos, and actions for this account';
+  document.getElementById('account-submit-btn').textContent = 'Save Account';
+  document.getElementById('custom-logo-preview').innerHTML = `<i data-lucide="image" class="w-5 h-5"></i>`;
+
+  // Select preset_bank
+  const bankRadio = document.querySelector('input[name="preset_logo"][value="preset_bank"]');
+  if (bankRadio) bankRadio.checked = true;
+  document.querySelectorAll('.preset-logo-option').forEach(el => {
+    el.classList.remove('border-indigo-500', 'text-indigo-400');
+    el.classList.add('border-slate-700', 'text-slate-300');
+  });
+  if (bankRadio && bankRadio.closest('label')) {
+    bankRadio.closest('label').classList.add('border-indigo-500', 'text-indigo-400');
+  }
+
+  document.getElementById('account-modal').classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function openEditAccountModal(accountId) {
+  const acc = accountsList.find(a => a.id === accountId);
+  if (!acc) return;
+
+  const form = document.getElementById('add-account-form');
+  if (form) form.reset();
+
+  document.getElementById('edit-account-id').value = acc.id;
+  document.getElementById('account-modal-title').textContent = `Edit "${acc.name}"`;
+  document.getElementById('account-modal-sub').textContent = 'Modify bank/wallet name, logo, type, or balance';
+  document.getElementById('account-submit-btn').textContent = 'Save Changes';
+
+  document.getElementById('account-name-input').value = acc.name;
+  document.getElementById('account-type-select').value = acc.account_type;
+  document.getElementById('account-balance-input').value = acc.initial_balance;
+  document.getElementById('account-color-input').value = acc.color || '#4f46e5';
+
+  const preview = document.getElementById('custom-logo-preview');
+  document.querySelectorAll('.preset-logo-option').forEach(el => {
+    el.classList.remove('border-indigo-500', 'text-indigo-400');
+    el.classList.add('border-slate-700', 'text-slate-300');
+  });
+
+  if (acc.logo && acc.logo.startsWith('/static/uploads/')) {
+    if (preview) {
+      preview.innerHTML = `<img src="${acc.logo}" class="w-full h-full object-cover">`;
+    }
+  } else {
+    const radio = document.querySelector(`input[name="preset_logo"][value="${acc.logo}"]`) || document.querySelector('input[name="preset_logo"][value="preset_bank"]');
+    if (radio) {
+      radio.checked = true;
+      if (radio.closest('label')) {
+        radio.closest('label').classList.add('border-indigo-500', 'text-indigo-400');
+      }
+    }
+    if (preview) {
+      preview.innerHTML = `<i data-lucide="image" class="w-5 h-5"></i>`;
+    }
+  }
+
   document.getElementById('account-modal').classList.remove('hidden');
   if (window.lucide) lucide.createIcons();
 }
@@ -860,26 +990,34 @@ async function handleAccountSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const formData = new FormData(form);
+  const editId = document.getElementById('edit-account-id').value;
 
   try {
-    const res = await fetch('/api/accounts', {
+    let url = '/api/accounts';
+    if (editId) {
+      url = `/api/accounts/${editId}`;
+    }
+
+    const res = await fetch(url, {
       method: 'POST',
       body: formData
     });
     const data = await res.json();
 
     if (res.ok) {
-      showToast('Account added successfully!', 'success');
+      showToast(data.message || (editId ? 'Account updated successfully!' : 'Account added successfully!'), 'success');
       closeAddAccountModal();
       form.reset();
       document.getElementById('custom-logo-preview').innerHTML = `<i data-lucide="image" class="w-5 h-5"></i>`;
       await fetchAccounts();
+      await loadCalendarMonth(currentYear, currentMonth);
+      await loadDateDetails(selectedDate);
       await fetchOverviewStats();
     } else {
-      showToast(data.error || 'Failed to create account', 'error');
+      showToast(data.error || 'Failed to save account', 'error');
     }
   } catch (err) {
-    showToast('Network error while creating account', 'error');
+    showToast('Network error while saving account', 'error');
   }
 }
 
