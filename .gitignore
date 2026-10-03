@@ -6,3 +6,4 @@ instance/
 .env
 *.db
 *.sqlite3
+tracker-app.bat
