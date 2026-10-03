@@ -1,102 +1,14 @@
 import sqlite3
 import os
 from datetime import datetime
-from dotenv import load_dotenv
-
-# Load environment variables from .env
-load_dotenv()
 
 DATABASE_NAME = "expense_tracker.db"
-DEFAULT_TURSO_URL = "libsql://tracker-rakeshhr.aws-ap-south-1.turso.io"
-
-TURSO_URL = os.environ.get("TURSO_DATABASE_URL", DEFAULT_TURSO_URL).strip()
-TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN", "").strip()
-
-try:
-    import libsql_client
-    HAS_LIBSQL = True
-except ImportError:
-    HAS_LIBSQL = False
-
-class TursoRow(dict):
-    """Row wrapper that supports both dict-style row['col'] and index-style row[0]."""
-    def __init__(self, columns, values):
-        super().__init__(zip(columns, values))
-        self._values = tuple(values)
-
-    def __getitem__(self, key):
-        if isinstance(key, int):
-            return self._values[key]
-        return super().__getitem__(key)
-
-class TursoCursor:
-    def __init__(self, client):
-        self.client = client
-        self.lastrowid = None
-        self.rowcount = 0
-        self._rows = []
-        self._columns = ()
-        self._idx = 0
-
-    def execute(self, sql, params=None):
-        if params is None:
-            res = self.client.execute(sql)
-        else:
-            args = list(params) if isinstance(params, (tuple, list)) else params
-            res = self.client.execute(sql, args)
-        self.lastrowid = res.last_insert_rowid
-        self.rowcount = res.rows_affected
-        self._columns = res.columns
-        self._rows = [TursoRow(res.columns, row) for row in res.rows]
-        self._idx = 0
-        return self
-
-    def executemany(self, sql, seq_of_params):
-        for params in seq_of_params:
-            self.execute(sql, params)
-        return self
-
-    def fetchone(self):
-        if self._idx < len(self._rows):
-            row = self._rows[self._idx]
-            self._idx += 1
-            return row
-        return None
-
-    def fetchall(self):
-        rows = self._rows[self._idx:]
-        self._idx = len(self._rows)
-        return rows
-
-class TursoConnection:
-    def __init__(self, url, auth_token):
-        # Convert libsql:// scheme to https:// for HTTP protocol
-        if url.startswith("libsql://"):
-            url = "https://" + url[len("libsql://"):]
-        self.client = libsql_client.create_client_sync(url=url, auth_token=auth_token)
-
-    def cursor(self):
-        return TursoCursor(self.client)
-
-    def execute(self, sql, params=None):
-        return self.cursor().execute(sql, params)
-
-    def commit(self):
-        pass
-
-    def close(self):
-        self.client.close()
 
 def get_db_path():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_dir, DATABASE_NAME)
 
-def is_using_turso():
-    return bool(HAS_LIBSQL and TURSO_URL and TURSO_TOKEN)
-
 def get_db():
-    if is_using_turso():
-        return TursoConnection(TURSO_URL, TURSO_TOKEN)
     conn = sqlite3.connect(get_db_path())
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
@@ -116,6 +28,7 @@ def check_db_connection():
         return bool(row)
     except Exception:
         return False
+
 
 
 def init_db():
